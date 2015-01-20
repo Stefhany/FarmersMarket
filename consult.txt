@@ -1,0 +1,7 @@
+select idCategorias,nombreCategoria, concat(nombres,' ',apellidos) as NombreProductor, idProductos
+nombreProducto, unidad, cantidad, precio 
+from ofertas o
+inner join productosasociadosusuarios pro on o.productosAsociadosUsuariosId = pro.idProductosAsociadosUsuarios
+inner join productos p on pro.productosId = p.idProductos
+inner join usuarios u on pro.usuariosId = u.idUsuarios 
+inner join categorias c on p.categoriasId = c.idCategorias;
