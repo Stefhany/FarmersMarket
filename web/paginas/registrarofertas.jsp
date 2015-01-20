@@ -28,7 +28,7 @@
             <label for ="txtProducto">Nombre producto:</label>
             <select name="txtProducto">
                 <% for (ProductoDTO pro : productos) {%>
-                <option value="<%if (pro != null){out.print(pro.getNombre());}%>">
+                <option value="<%if (pro != null){out.print(pro.getIdProductos());}%>">
                     <%if (pro != null){out.print(pro.getNombre());}%></option>
                 <%
                     }
@@ -41,10 +41,10 @@
             <label for ="txtPrecio">Precio:</label>
             <input name="txtPrecio" id="txtPrecio" type="text" value=""/><br>
             
-            <input name="txtId" id="txtId" type="hidden" value="3"/><br>
+            <input name="txtId" id="txtId" type="hidden" value="4"/><br>
             
             
-            <input type="hidden" name="registrarOferta" id="registrarPersona" value=""/>
+            <input type="hidden" name="registrarOferta" id="registrarOferta" value=""/>
             <input type="submit" value="Ofertar" name="btnRegistrarOferta"/>
         </form>
     </body>

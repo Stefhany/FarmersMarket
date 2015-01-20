@@ -50,6 +50,7 @@
                     <th>Unidad</th>
                     <th>Precio</th>
                     <th>Solicitar</th>
+                    <th>Modificar</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,9 +64,12 @@
                     <td><%=ofer.getCantidad()%></td>
                     <td><%=ofer.getProducts().getUnidad()%></td>
                     <td><%=ofer.getPrecio()%></td>
-                    <td><a href="../Controlador?id=<%=ofer.getIdOfertas()%>"><img src="../imagenes/order.png" width="48" height="48" alt="Solicitar <%=ofer.getProducts().getNombre()%>" 
+                    <td><a href="aplicaroferta.jsp?id=<%=ofer.getIdOfertas()%>"><img src="../imagenes/order.png" width="48" height="48" alt="Solicitar <%=ofer.getProducts().getNombre()%>" 
                                                                                   title="Solicitar el producto: <%=ofer.getProducts().getNombre()%>" onclick="window.open('solicitarpedido.jsp', 
                                                                                               'Solicitar Pedido', 'width=100', 'height=200', 'menubar=No')">
+                        </a></td> 
+                            <td><a href="modificaroferta.jsp?id=<%=ofer.getIdOfertas()%>"><img src="../imagenes/modificar.png" width="32" height="32" alt="Modificar oferta <%=ofer.getProducts().getNombre()%>" 
+                                                                                  title="Modificar oferta: <%=ofer.getProducts().getNombre()%>">
                         </a></td>  
                 </tr>
                 <%

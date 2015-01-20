@@ -37,7 +37,8 @@ public class Controlador extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
+            //throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         String salida = "jnjnjln";
@@ -73,24 +74,24 @@ public class Controlador extends HttpServlet {
                 salida = prdao.modificarProducto(prdto);
                 out.print(salida);
                 //response.sendRedirect("index.jsp?msj=" + salida);
-            } else if (request.getParameter("btnIngresar") != null && request.getParameter("iUsuario") != null) {
+            } else if (request.getParameter("btnIngresarSistema") != null && request.getParameter("ingresarSistema") != null) {
                 UsuariosDAO udao = new UsuariosDAO();
                 UsuariosDTO udto = new UsuariosDTO();
-                udto = udao.validarUsuario(request.getParameter("txtcorreo"), request.getParameter("txtclave"));
+                udto = udao.validarUsuario(request.getParameter("txtCorreo"), request.getParameter("txtClave"));
                 if (udto.getIdUsuarios() != 0) {
                     HttpSession miSesion = request.getSession(true);
                     miSesion.setAttribute("usuarioLogueado", udto);
-                    response.sendRedirect("listarofertas.jsp");
+                    response.sendRedirect("indexrol.jsp");
                 } else {
-                    response.sendRedirect("login.jsp?msg=Usuario No existe!!");
+                    response.sendRedirect("paginas/login.jsp?msg=Usuario No existe!!");
                 }
             }
             
             else {
-                System.out.println("Esta ingresando de forma fraudalenta");
+                out.println("Esta ingresando de forma fraudalenta");
             }
-        } finally {
-
+        }finally {
+out.print("knc");
         }
     }
 

@@ -193,6 +193,7 @@ public class UsuariosDAO {
                     udto.setCorreo(resultadoSet.getString("correo"));
                     udto.setClave(resultadoSet.getString("clave"));
                     udto.setNotificacion(resultadoSet.getBoolean("notificaciones"));
+                    udto.setCiudad(resultadoSet.getString("ciudad"));
                     udto.setFechaNacimiento(resultadoSet.getString("fechaNacimiento"));
                 }
             } else {

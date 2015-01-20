@@ -28,18 +28,13 @@
                         <td><input type="text" id="txtAporte" name="txtAporte"></td>
                     </tr>
                     <tr> 
-
                         <td><label for="txtUnidad">Unidad:</label></td>
                         <td><input name="txtUnidad" id="txtUnidad" value="Kg" readonly="true"></td>                                                
                     </tr>
-
                     <tr>
                         <td></td>
                         <td><input type="submit" onclick="return confirm('seguro que desea hacer esto?')" value="aplicar"></td>
-                    </tr>
-
-
-                </table></center>
+                    </tr> </table></center>
 
 
         </form>
