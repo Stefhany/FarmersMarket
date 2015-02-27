@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8819004a-ccb0-4801-b682-4f569176adf3">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="apellido" class="java.lang.String"/>
+	<field name="cedula" class="java.lang.String"/>
+	<field name="telefono" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="172" y="22" width="226" height="31" uuid="401991de-0185-46f0-b178-bc008bbafc71"/>
+				<textElement>
+					<font fontName="Arial" size="24"/>
+				</textElement>
+				<text><![CDATA[Usuarios registrados]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="24" y="0" width="100" height="20" uuid="ca366ca2-17bb-456f-9b44-7b27914d4272"/>
+				<text><![CDATA[Nombres]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="172" y="0" width="100" height="20" uuid="ea6273f1-a14a-4dcc-921d-b52037a491ff"/>
+				<text><![CDATA[Apellido]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="312" y="0" width="100" height="20" uuid="92342525-09f7-42b6-a51f-0e0737adfc14"/>
+				<text><![CDATA[Cédula]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="441" y="0" width="100" height="20" uuid="b2f4a4a0-3b6d-4038-b03e-da7fd8d8e16f"/>
+				<text><![CDATA[Teléfono]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement x="24" y="0" width="100" height="20" uuid="1fda8de7-14a4-4b60-9630-1021e68fa044"/>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="172" y="0" width="100" height="20" uuid="65a315e2-261a-4f35-9eb3-9d8738b11ab0"/>
+				<textFieldExpression><![CDATA[$F{apellido}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="312" y="0" width="100" height="20" uuid="293d7ba8-0cb0-4599-84e7-a425848e15cc"/>
+				<textFieldExpression><![CDATA[$F{cedula}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="441" y="0" width="100" height="20" uuid="d7d070be-79a7-4095-bce7-3d0277febd6a"/>
+				<textFieldExpression><![CDATA[$F{telefono}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

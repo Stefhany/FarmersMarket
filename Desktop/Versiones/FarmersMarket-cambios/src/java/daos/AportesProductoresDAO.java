@@ -1,0 +1,132 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package daos;
+
+import dtos.ProductoDTO;
+import dtos.SolicitudDistribuidorDTO;
+import dtos.UsuariosDTO;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import utilidades.Conectar;
+
+/**
+ *
+ * @author Mona
+ */
+public class AportesProductoresDAO {
+    PreparedStatement pstmt = null;
+    CallableStatement cllstmt = null;
+    Connection cnn = null;
+    ResultSet rs = null;
+    int resultado = 0;
+    String salida = "";
+
+    public AportesProductoresDAO() {
+        cnn = Conectar.getInstance();
+    }
+    
+    public LinkedList<SolicitudDistribuidorDTO> listarSolicitudesDeAsociacion() {
+        LinkedList<SolicitudDistribuidorDTO> solicitudes = new LinkedList();
+        try {
+            String querrySolicitudesDistribuidor = " select idSolicitudDistribuidor, idUsuarios, "
+                    + " concat(nombres,' ',apellidos) as Distribuidor, idProductos, "
+                    + " nombreProducto, cantidadSolicitada, fechaEntregaInterna "
+                    + " from solicituddistribuidor  s "
+                    + " inner join productos p on "
+                    + " p.idProductos = s.productosId "
+                    + " inner join usuarios u on "
+                    + " u.idUsuarios = s.distribuidorId"
+                    + " WHERE fechaEntregaInterna IS NOT NULL"
+                    + " AND estadosPedidosId = 3;";
+            pstmt = cnn.prepareStatement(querrySolicitudesDistribuidor);
+            rs = pstmt.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    UsuariosDTO user = new UsuariosDTO(rs.getInt("idUsuarios"), rs.getString("Distribuidor"));
+                    ProductoDTO pro = new ProductoDTO(rs.getInt("idProductos"), rs.getString("nombreProducto"));
+                    SolicitudDistribuidorDTO solicitud = new SolicitudDistribuidorDTO(user, pro);
+                    solicitud.setIdSolicitud(rs.getInt("idSolicitudDistribuidor"));
+                    solicitud.setCantidadSolicitada(rs.getInt("cantidadSolicitada"));
+                    solicitud.setFechaEntregaInterna(rs.getString("fechaEntregaInterna"));
+                    solicitudes.add(solicitud);
+                }
+            }
+        } catch (SQLException sqle) {
+            salida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
+        }
+        return solicitudes;
+    }
+    
+    public SolicitudDistribuidorDTO byIdForAssociation(int id) {
+        SolicitudDistribuidorDTO solicitud = null;
+        try {
+            String querrySolicitudesDistribuidor = " SELECT idSolicitudDistribuidor, idUsuarios,"
+                    + " concat(nombres, ' ', apellidos) AS Distribuidor, idProductos, nombreProducto,"
+                    + " cantidadSolicitada, fechaEntregaInterna FROM solicituddistribuidor s"
+                    + " INNER JOIN productos p ON (s.productosId = p.idProductos)"
+                    + " INNER JOIN usuarios u ON (s.distribuidorId = u.idUsuarios)"
+                    + " WHERE  idSolicitudDistribuidor = ?;";
+            pstmt = cnn.prepareStatement(querrySolicitudesDistribuidor);
+            pstmt.setInt(1, id);
+            rs = pstmt.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    UsuariosDTO user = new UsuariosDTO();
+                    user.setIdUsuarios(rs.getInt("idUsuarios"));
+                    user.setNombres(rs.getString("Distribuidor"));
+                    ProductoDTO pro = new ProductoDTO();
+                    pro.setIdProductos(rs.getInt("idProductos"));
+                    pro.setNombre(rs.getString("nombreProducto"));
+                    solicitud = new SolicitudDistribuidorDTO(user, pro);
+                    solicitud.setIdSolicitud(rs.getInt("idSolicitudDistribuidor"));
+                    solicitud.setCantidadSolicitada(rs.getInt("cantidadSolicitada"));
+                    solicitud.setFechaEntregaInterna(rs.getString("fechaEntregaInterna"));
+                }
+            }
+
+        } catch (SQLException sqle) {
+            salida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
+        }
+        return solicitud;
+    }
+    
+    
+    public String aplicarSolicitudAsociacion(String fechaEntrega, int cantidadAportar, int proAsoId, 
+            int idSolicitud){
+        
+        int sal = 0;
+        String mensaje = " ";
+        try {
+            String procedureOrder = "{call ps_aplicarSolicitudV5(?,?,?,?,?)}";
+            
+            cllstmt = cnn.prepareCall(procedureOrder);
+            cllstmt.setString(1, fechaEntrega);
+            cllstmt.setInt(2, cantidadAportar);
+            cllstmt.setInt(3, proAsoId);
+            cllstmt.setInt(4, idSolicitud);
+            cllstmt.registerOutParameter(5, java.sql.Types.INTEGER);
+            cllstmt.execute();
+            sal = cllstmt.getInt(5);
+            
+            if (sal == 1) {
+                mensaje = "Bien. Revisa la base de datos. Ocurrio el primer procedimiento";
+            } else if (sal == 2) {
+                mensaje = "Bien. Ocurrio el segundo procedimiento";
+            } else if (sal == -1) {
+                mensaje = "No ha tenido modificación la base de datos";
+            } else {
+                mensaje = "something was wrong!!!";
+            }
+        }catch(SQLException sqle){
+            mensaje = "Pilas! Ocurrio la siguiente excepción " + sqle.getMessage();
+        }
+        return mensaje;
+    }
+}
