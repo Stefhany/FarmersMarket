@@ -46,7 +46,7 @@
                     <td><%out.write(offer.getProducts().getUnidad() + " \t");%></td>
                     <td><%out.write(offer.getPrecio() + " \t");%></td>
                 <%
-                        out.write("\n");
+                    out.write("\n");
                     }
                 %>    
             </tbody>

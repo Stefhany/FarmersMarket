@@ -1,74 +1,45 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 07-mar-2015, 8:22:59
+    Author     : Mona
+*/
+
+
+
 label, input, select {
-
     display: block;
-    margin: 0 auto 1px;
-
+    width: 200px;
+    float: left;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    height:22px;
 }
 label {
-    position:absolute;
-    margin-left: 370px; 
-    margin-top: 8px;
-    display: block;
-
-
-}
-input, select, option {
-
-    width: 250px;
-    height: 30px;
-    margin: 0 auto;
-
-}
-checkbox #terminos{
-    width:  20px;
-    height: 20px;
+    text-align: right;
+    width: 150px;
+    padding-right: 20px;
+    font-size:14px;
 }
 
-input.valid{  
-    background-color: #EFE;
-    border-color: #393;
-}
-input.error{
-    background-color: #FEE;
-    border-color: #933;
-}
-select.error{
-    background-color: #FEE;
-    border-color: #933;
-}
-select.valid{
-    background-color: #EFE;
-    border-color: #393;
+
+br {
+    clear: left;
 }
 
-h1{
-    margin: 0 auto;
-    text-align: center;
-    color: #9c5959;
-    text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2);
-    font-weight: normal;
-    line-height: 1.3;
-    font-family: 'cursive', 'Lobster13Regular'
-}
-h2{
-    margin: 0 auto;
-    text-align: center;
-    color: #9c5959;
-    text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2);
-    font-weight: normal;
-    line-height: 1.3;
-    font-family: 'cursive', 'Lobster13Regular'
-}
-
-body{
-    background-color: #D8D8D8;
+.marco {
+    text-align:center;
+    width: 500px;
+    margin-left:20%;
 }
 
 
 .style1 {
     font-size: 18px;
     font-weight: bold;
-    color: lightseagreen;
 }
 .style2 {color: #000000}
 .style3 {
@@ -82,30 +53,5 @@ body{
     font-weight: bold;
 }
 
-.imagen{
-    display:block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 60px;
-    margin-top: 80px;
 
-}
-.pacifico{
-	font-family: 'Pacifico', cursive;
-}
-.pacifico-masgrande{
-	font-family: 'Pacifico', cursive;	
-	font-size: 3em;
-}
-.quitarlink{
-    text-decoration: none;
-    color: #9c5959;
-    
-}
-.quitarlink:hover{
-    
-     color: #eea236;
-     font-family: 'Pacifico', cursive;
-     font-size: 1.1em;
-}
 

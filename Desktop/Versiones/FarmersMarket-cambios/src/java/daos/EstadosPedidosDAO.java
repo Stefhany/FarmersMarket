@@ -12,63 +12,63 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import utilidades.Conectar;
+import Conexion.Conection;
 
 /**
  *
  * @author krito
  */
 public class EstadosPedidosDAO {
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    Connection cnn = null;
-    String salida = " ";
-    int resultado = 0;
-    EstadosPedidosDTO epdto = new EstadosPedidosDTO();
-    ArrayList <EstadosPedidosDTO> estados = new ArrayList<>();
+    private PreparedStatement pstmt = null;
+    private ResultSet rs = null;
+    private Connection cnn = null;
     
-    public EstadosPedidosDAO (){
-        cnn = Conectar.getInstance();
-    }
-    
-    public String insertarEstadoPedido(EstadosPedidosDTO nuevoEstado) {
+    public String insertarEstadoPedido(EstadosPedidosDTO nuevoEstado, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String sal = "";
         try {
             pstmt = cnn.prepareStatement("INSERT INTO estadospedidos VALUES (null, ?, ?);");
             pstmt.setString(1, nuevoEstado.getNombre());
             pstmt.setString(2, nuevoEstado.getObservaciones());
-            resultado = pstmt.executeUpdate();
+            rtdo = pstmt.executeUpdate();
 
-            if (resultado != 0) {
-                salida = "El registro del estado del pedido " + resultado + " ha sido exitoso";
+            if (rtdo != 0) {
+                sal = "El registro del estado del pedido " + rtdo + " ha sido exitoso";
             } else {
-                salida = "No se pudo realizar el registro";
+                sal = "No se pudo realizar el registro";
             }
         } catch (SQLException sqle) {
-            salida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
+            sal = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
 
         }
-        return salida;
+        return sal;
     }
 
-    public String modificarEstadoPedido(EstadosPedidosDTO modEstado) {
+    public String modificarEstadoPedido(EstadosPedidosDTO modEstado, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String msgSalida = "";
         try{
         pstmt = cnn.prepareStatement("UPDATE estadospedidos SET nombre = ?, observaciones = ? WHERE idEstadosPedidos = ?;");
         pstmt.setString(1, modEstado.getNombre());
         pstmt.setString(2, modEstado.getObservaciones());
-        resultado =  pstmt.executeUpdate();
+        rtdo =  pstmt.executeUpdate();
         
-        if (resultado != 0) {
-            salida = "La modificación "+ resultado +  " se pudo realizar exitosamente";
+        if (rtdo != 0) {
+            msgSalida = "La modificación "+ rtdo +  " se pudo realizar exitosamente";
         }else{
-            salida = "No se pudo realizar la modificación";
+            msgSalida = "No se pudo realizar la modificación";
         }
         }catch(SQLException sqle){
-            salida = "Ha ocurrido lo siguiente... "+sqle.getMessage();
+            msgSalida = "Ha ocurrido lo siguiente... "+sqle.getMessage();
         }       
-        return salida;
+        return msgSalida;
     }
     
-    public ArrayList<EstadosPedidosDTO> listarEstadosPedidos(){
+    public ArrayList<EstadosPedidosDTO> listarEstadosPedidos(Connection cnn){
+        ArrayList<EstadosPedidosDTO> estados = new ArrayList();
+        this.cnn = cnn;
         try{
         pstmt = cnn.prepareStatement("SELECT idEstadosPedidos as id, nombre, observaciones FROM estadospedidos;");
         rs = pstmt.executeQuery();
@@ -90,27 +90,33 @@ public class EstadosPedidosDAO {
         return estados;
     }
     
-    public String eliminarEstadoPedido(int id){
+    public String eliminarEstadoPedido(int id, Connection cnn){
+        this.cnn = cnn;
+        int resultado = 0;
+        String msgSalida = "";
         try{
             pstmt = cnn.prepareStatement("DELETE FROM estadospedidos WHERE idEstadosPedidos = ?;");
             pstmt.setInt(1, id);
             resultado = pstmt.executeUpdate();
             
             if (resultado != 0) {
-                salida = "El registro " + resultado + " ha sido eliminado. Exitosamente";
+                msgSalida = "El registro " + resultado + " ha sido eliminado. Exitosamente";
             }
         }catch (SQLException sqle){
-            salida = "Ocurrio esta excepción "+sqle.getMessage();
+            msgSalida = "Ocurrio esta excepción "+sqle.getMessage();
         }
-        return salida;
+        return msgSalida;
     }
     
-    public EstadosPedidosDTO consultarByIdEstadoPedido(int id){
+    public EstadosPedidosDTO consultarByIdEstadoPedido(int id, Connection cnn){
+        this.cnn = cnn;
+        EstadosPedidosDTO epdto = null;
         try{
             pstmt = cnn.prepareStatement("SELECT idEstadosPedidos as id, nombre, observaciones FROM estadospedidos WHERE idEstadosPedidos = ?;");
             rs = pstmt.executeQuery();
             if (rs != null) {
                 while(rs.next()){
+                    epdto = new EstadosPedidosDTO();
                     epdto.setIdEstadoPedidos(rs.getInt("id"));
                     epdto.setNombre(rs.getString("nombre"));
                     epdto.setObservaciones(rs.getString("observaciones"));

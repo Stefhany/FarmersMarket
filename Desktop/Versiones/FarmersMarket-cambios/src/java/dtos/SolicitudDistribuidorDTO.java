@@ -177,16 +177,16 @@ public class SolicitudDistribuidorDTO {
     @Override
     public String toString() {
         return "SolicitudDistribuidorDTO " 
-                + " idSolicitud=" + idSolicitud 
+                + ", idSolicitud=" + idSolicitud 
                 + ", cantidadSolicitada=" + cantidadSolicitada 
                 + ", fechaSolicitud=" + fechaSolicitud
                 + ", fechaEntregaInterna=" + fechaEntregaInterna
                 + ", estadoId=" + estadoId 
                 + ", productoId=" + productoId
                 + ", distribuidorId=" + distribuidorId 
-                + ", product = " + proAso.getProducto().getNombre()
-                + ", user = " + proAso.getUsuario().getNombres()
-                + ", proAso = " + getProAso().getIdProductosAsociadosUsuarios();
+                + ", product = " + product.getIdProductos()
+                + ", user = " + user.getIdUsuarios();
+//                + ", proAso = " + getProAso().getIdProductosAsociadosUsuarios();
     }
     
     

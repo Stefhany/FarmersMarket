@@ -1,11 +1,7 @@
 /*
-
  * To change this license header, choose License Headers in Project Properties.
-
  * To change this template file, choose Tools | Templates
-
  * and open the template in the editor.
-
  */
 package daos;
 
@@ -18,32 +14,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import utilidades.Conectar;
+import Conexion.Conection;
+import utilidades.MyException;
+
 
 /**
- *
- *
- *
  * @author krito
- *
  */
 public class ProductoDAO {
 
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    Connection cnn = null;
-    String salida = " ";
-    int resultado = 0;
+    private PreparedStatement pstmt = null;
+    private ResultSet rs = null;
+    private Connection cnn = null;
 
-    public ProductoDAO() {
-
-        cnn = Conectar.getInstance();
-
-    }
-
-    public String insertarProducto(ProductoDTO nuevoProducto) {
+    public String insertarProducto(ProductoDTO nuevoProducto, Connection cnn) {
+        this.cnn = cnn;
+        int resultado = 0;
+        String msgSalida = "";
         try {
             pstmt = cnn.prepareStatement("INSERT INTO productos VALUES (null, ?,?,?);");
             pstmt.setString(1, nuevoProducto.getNombre());
@@ -51,49 +38,56 @@ public class ProductoDAO {
             pstmt.setInt(3, nuevoProducto.getCategoriaId().getIdCategoria());
             resultado = pstmt.executeUpdate();
             if (resultado != 0) {
-                salida = "El registro del producto " + resultado + " ha sido exitoso";
+                msgSalida = "El registro del producto " + resultado + " ha sido exitoso";
             } else {
-                salida = "No se pudo realizar el registro";
+                msgSalida = "No se pudo realizar el registro";
             }
         } catch (SQLException sqle) {
-            salida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
+            msgSalida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
         }
-        return salida;
+        return msgSalida;
     }
 
-    public String modificarProducto(ProductoDTO modProducto) {
+    public String modificarProducto(ProductoDTO modProducto, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String msgSalida = "";
         try {
             pstmt = cnn.prepareStatement("UPDATE productos SET nombre = ?, unidad = ?, categoriasId =  ? WHERE  idProductos =  ?;");
             pstmt.setString(1, modProducto.getNombre());
             pstmt.setString(2, modProducto.getUnidad());
             pstmt.setFloat(3, modProducto.getCategoriaId().getIdCategoria());
-            resultado = pstmt.executeUpdate();
-            if (resultado != 0) {
-                salida = "La modificación " + resultado + " se pudo realizar, exitosamente";
+            rtdo = pstmt.executeUpdate();
+            if (rtdo != 0) {
+                msgSalida = "La modificación " + rtdo + " se pudo realizar, exitosamente";
             } else {
-                salida = "No se pudo realizar la modificación";
+                msgSalida = "No se pudo realizar la modificación";
             }
         } catch (SQLException sqle) {
-            salida = "Ha ocurrido lo siguiente... " + sqle.getMessage();
+            msgSalida = "Ha ocurrido lo siguiente... " + sqle.getMessage();
         }
-        return salida;
+        return msgSalida;
     }
 
-    public String eliminarProducto(int id) {
+    public String eliminarProducto(int id, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String msgSalida = "";
         try {
             pstmt = cnn.prepareStatement("DELETE FROM productos WHERE idProductos = ?;");
             pstmt.setInt(1, id);
-            resultado = pstmt.executeUpdate();
-            if (resultado != 0) {
-                salida = "Registro " + resultado + " eliminado. Exitosamente";
+            rtdo = pstmt.executeUpdate();
+            if (rtdo != 0) {
+                msgSalida = "Registro " + rtdo + " eliminado. Exitosamente";
             }
         } catch (SQLException sqle) {
-            salida = "Ocurrio esta excepción " + sqle.getMessage();
+            msgSalida = "Ocurrio esta excepción " + sqle.getMessage();
         }
-        return salida;
+        return msgSalida;
     }
 
-    public List<ProductoDTO> listarAllProductos() throws MyException {
+    public List<ProductoDTO> listarAllProductos(Connection cnn) throws MyException {
+        this.cnn = cnn;
         LinkedList<ProductoDTO> products = new LinkedList();
         try {
             String queryAllPro = " select idproductos, nombreProducto, unidad, idcategorias, nombreCategoria "
@@ -108,17 +102,12 @@ public class ProductoDAO {
             }
         } catch (SQLException sqle) {
             throw new MyException("Ocurrio este error al listar los elementos: " + sqle.getSQLState() + " - " + sqle.getMessage());
-        } finally {
-            try {
-                pstmt.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(ProductoDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        } 
         return products;
     }
 
-    public ProductoDTO consultarByIdProduct(int id) throws MyException{
+    public ProductoDTO consultarByIdProduct(int id, Connection cnn) throws MyException{
+        this.cnn = cnn;
         ProductoDTO onlyProduct = null;
         try {
             String querryByIdProduct = "select idProductos as id,nombreProducto, unidad, "

@@ -11,8 +11,8 @@ package dtos;
  */
 public class ReportePruebaDTO {
 
-    private String nombres = " ";
-    private String apellidos = " ";
+    private String nombres = "";
+    private String apellidos = "";
     private int cedula = 0;
     private int telefono = 0;
 

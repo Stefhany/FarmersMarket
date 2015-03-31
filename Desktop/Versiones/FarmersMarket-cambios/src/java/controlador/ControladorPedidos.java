@@ -6,9 +6,11 @@
 package controlador;
 
 import daos.AportesProductoresDAO;
+import daos.DespachosPedidosDAO;
 import daos.PedidoSobreOfertaDAO;
 import daos.SolicitudDistribuidorDAO;
 import dtos.AportesProductoresDTO;
+import dtos.DespachosPedidosDTO;
 import dtos.SolicitudDistribuidorDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -53,7 +55,7 @@ public class ControladorPedidos extends HttpServlet {
 
             } else if (request.getParameter("idSolicitud") != null) {
                 SolicitudDistribuidorDAO soldao = new SolicitudDistribuidorDAO();
-                String msj = " ";
+                String msj = "";
                 msj = soldao.eliminarSolicitud(Integer.parseInt(request.getParameter("idSolicitud")));
                 response.sendRedirect("paginas/listarsolicitudesasociaciones.jsp?msg= " + msj);
                 
@@ -71,14 +73,27 @@ public class ControladorPedidos extends HttpServlet {
                 SolicitudDistribuidorDAO solDao = new SolicitudDistribuidorDAO();
                 String salida = solDao.modificarSolicitudDistribuidor(solDto);
                 response.sendRedirect("index.jsp?msg= "+salida);
+                
             }else if(request.getParameter("btnAplicarSolicitud") != null && request.getParameter("aplicarSolicitud") != null){
                 AportesProductoresDAO aporDao = new AportesProductoresDAO();
                 String salida = aporDao.aplicarSolicitudAsociacion(request.getParameter("txtFechaEntrega").trim(), 
                         Integer.parseInt(request.getParameter("txtCantidadAportar").trim()),
                         Integer.parseInt(request.getParameter("txtIdAso").trim()), 
                         Integer.parseInt(request.getParameter("txtIdSolicitud").trim()));
-                response.sendRedirect("index.jsp?msg= " + salida);
-            }else {
+                response.sendRedirect("paginas/listarsolicitudesproductores.jsp?msg= " + salida);
+            }else if(request.getParameter("btnDespacharPedido") != null && request.getParameter("despacharPedido") != null){
+                DespachosPedidosDTO dto = new DespachosPedidosDTO();
+                dto.setDireccionDespacho(request.getParameter("txtDireccion").trim());
+                dto.setFechaDespacho(request.getParameter("txtFechaEnvio").trim());
+                dto.setObservaciones(request.getParameter("txtObservacion").trim());
+                dto.setSolicitudId(Integer.parseInt(request.getParameter("txtSolicitud").trim()));
+                dto.setUsuariosId(Integer.parseInt(request.getParameter("txtUser").trim()));
+                DespachosPedidosDAO despacho = new DespachosPedidosDAO();
+                String salida = despacho.insertarDespacho(dto);
+                response.sendRedirect("paginas/listardespachos.jsp?msg = El despacho ha sido registrado. ");
+            }
+            
+            else {
                 System.out.println("Esta ingresando de forma fraudalenta");
             }
         } finally {

@@ -4,6 +4,7 @@
     Author     : krito
 --%>
 
+<%@page import="dtos.UsuariosDTO"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="dtos.ProductoDTO"%>
 <%@page import="dtos.CategoriaDTO"%>
@@ -15,11 +16,17 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        
-        <title>Farmers Market | Productos</title>
-        <!-- bootstrap 3.0.2-->
-        <link href="styles/bootstrap.min.css" rel="stylesheet" type="text/css"/> 
-
+        <title>SIGAA | Productos</title>
+        <link rel="stylesheet" type="text/css" href="../css/bootstrap.css"> 
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
+        <link rel="icon" href="../img/favicon.ico" type="image/x-ico"/>
+        <script src="../js/jquery-1.11.2.min.js"></script>
+        <script src="../js/bootstrap.js"></script>
+        <%
+            response.setHeader("Cache-Control", "no-cache");
+            response.setHeader("Cache-Control", "no-store");
+            response.setDateHeader("Expires", 0);
+        %>
         <script>
             function confirmar() {
                 if (confirm('¿Esta seguro de borrar este producto?')) {
@@ -29,7 +36,7 @@
                 }
             }
         </script>
-        
+
         <script type="text/javascript" src="../js/paging.js"></script>
 
         <%
@@ -42,54 +49,105 @@
         %>
     </head>
     <body>
-        
-        <form  method="get" enctype="application/x-www-form-urlencoded">
-            <table border="1" id="results">
-            <thead>
-                <tr>
-                    <th>Codigo</th>
-                    <th>Nombre producto</th>
-                    <th>Unidad</th>
-                    <th>Categoria</th>
-                    <th>Eliminar</th>
-                    <th>Modificar</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%
-                    for (ProductoDTO p : productos) {
-                %>
-                <tr>
-                    <td><%=p.getIdProductos()%></td>
-                    <td><%=p.getNombre()%></td>
-                    <td><%=p.getUnidad()%></td>
-                    <td><%=p.getCategoriaId().getNombre()%></td>
-                    <td><a href="../Controlador?idProducto=<%=p.getIdProductos()%>" onclick="return confirmar();"><img src="../imagenes/eliminar.png" width="32" height="32" alt="Eliminar producto" title="Eliminar producto"/>
-                        </a></td>
+        <div class="container">
+            <header>
+                <img src="../img/banner.png" alt="" class="col-xs-12">
+            </header>
+            <div class="col-xs-12" >
+                <div class="nav"> 						
+                    <ul id="bar"  style="float:right;">
+                        <li><a href="#">Cerrar sesión</a></li>
+                    </ul>
+                </div>	
+            </div>
 
-                    <td><a href="modificarproducto.jsp?id=<%=p.getIdProductos()%>"><img src="../imagenes/actualizar.png" width="32" height="32" alt="Modificar producto" title="Modificar producto"/>
-                        </a></td>     
+            <div class="row">
 
-                </tr>
-                <%
-                    }%>
+                <center>    
+                    <div class="main" style="width: 96%;" >
+                        <div class="row">
+                            <div class="cuerpo" style="width: 85%; height: 520px; left: 25%;  float: right;">
 
-            </tbody>
-        </table>
-                    
-        <a href="reporteproductos.jsp"><img src="../imagenes/excel.png" width="32" height="32" title="Descargar en Excel"></a>
+                                <div class="derecha">
+                                    <center>
+                                        <h1>Productos</h1>
+                                        <table border="1" id="results" class="table table-bordered" style="width:95%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Codigo</th>
+                                                    <th>Nombre producto</th>
+                                                    <th>Unidad</th>
+                                                    <th>Categoria</th>
+                                                    <th>Eliminar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <%
+                                                    for (ProductoDTO p : productos) {
+                                                %>
+                                                <tr>
+                                                    <td><%=p.getIdProductos()%></td>
+                                                    <td><%=p.getNombre()%></td>
+                                                    <td><%=p.getUnidad()%></td>
+                                                    <td><%=p.getCategoriaId().getNombre()%></td>
+                                                    <td><a href="../Controlador?idProducto=<%=p.getIdProductos()%>" onclick="return confirmar();"><img src="../imagenes/eliminar.png" width="32" height="32" alt="Eliminar producto" title="Eliminar producto"/>
+                                                        </a></td>
+                                                </tr>
+                                                <%
+                                                        }%>
 
-        <div id="pageNavPosition"></div>
-        
-        </form>       
-        
-       <script type="text/javascript"><!--
-        var pager = new Pager('results', 4); 
-        pager.init(); 
-        pager.showPageNav('pager', 'pageNavPosition'); 
-        pager.showPage(1);
-    //--></script>
+                                            </tbody>
+                                        </table>
 
+                                                        <a href="reporteproductos.jsp"><img src="../imagenes/excel.png" width="32" height="32" title="Descargar en Excel" alt="Generar excel"></a>
+
+                                        <div style="cursor:pointer;" id="pageNavPosition"></div>
+                                    </center>   
+                                </div>
+
+                            </div>    
+                            <div class="submenu"  style="border: 1px solid #000; width: 15%; height: 520px; right: 20%;float: left; ">
+
+                                <div id="submenu">
+                                    <div class="barraleft" >
+
+                                        <div class="panel-body" id="menuStyle">
+                                            <%
+                                                HttpSession miSesion = request.getSession(false);
+                                                if (miSesion.getAttribute("usr") != null) {
+                                                    UsuariosDTO uregistrado = (UsuariosDTO) miSesion.getAttribute("usr");
+                                                    String menu = (String) miSesion.getAttribute("mp");
+
+                                                    out.print("Usuario : " + uregistrado.getNombres());
+                                                    out.println(menu);
+
+                                                } else {
+                                                    response.sendRedirect("../index.jsp");
+                                                }
+                                                //class="text-left"
+                                            %>
+
+
+                                        </div>   
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </center>
+            </div>	 			
+            <footer class="cnt"> Pie de Pagina </footer> 
+        </div>  
+        <script type="text/javascript">
+            <!--
+                    var pager = new Pager('results', 6);
+            pager.init();
+            pager.showPageNav('pager', 'pageNavPosition');
+            pager.showPage(1);
+            //--></script>
         <div class="style">
             <%
                 if (request.getParameter("msg") != null) {

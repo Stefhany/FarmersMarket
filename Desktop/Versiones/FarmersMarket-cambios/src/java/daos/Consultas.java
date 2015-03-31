@@ -5,6 +5,7 @@
  */
 package daos;
 
+import dtos.ConsultasDTO;
 import dtos.OfertasDTO;
 import dtos.ProductoDTO;
 import dtos.ProductosAsociadosUsuariosDTO;
@@ -15,7 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
-import utilidades.Conectar;
+import Conexion.Conection;
 
 /**
  *
@@ -23,18 +24,15 @@ import utilidades.Conectar;
  */
 public class Consultas {
 
-    ResultSet rs = null;
-    PreparedStatement pstmt = null;
-    Connection cnn = null;
-
-    public Consultas() {
-        cnn = Conectar.getInstance();
-    }
-    
+    private ResultSet rs = null;
+    private PreparedStatement pstmt = null;
+    private Connection cnn = null;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String salida = "";
-    public LinkedList<ProductosAsociadosUsuariosDTO> consultarFiltro(String filtro) {
-        LinkedList<ProductosAsociadosUsuariosDTO> listaFiltro = new LinkedList();
+    
+    public LinkedList<OfertasDTO> consultarFiltro(String filtro, Connection cnn) {
+        this.cnn = cnn;
+        String salida = "";
+        LinkedList<OfertasDTO> listaFiltro = new LinkedList();
         try {
             String querryFiltro = " select idProductosAsociadosUsuarios, usuariosId, "
                     + " concat(nombres,' ',apellidos) as Productor, productosId,"
@@ -52,12 +50,34 @@ public class Consultas {
                     ProductoDTO pro = new ProductoDTO(rs.getInt("productosId"), rs.getString("nombreProducto"));
                     ProductosAsociadosUsuariosDTO proAso = new ProductosAsociadosUsuariosDTO(user, pro);
                     proAso.setIdProductosAsociadosUsuarios(rs.getInt("idProductosAsociadosUsuarios"));
-                    listaFiltro.add(proAso);
+                    OfertasDTO ofer = new OfertasDTO(proAso);
+                    ofer.setFechaFin(rs.getString("FechaFin"));
+                    listaFiltro.add(ofer);
                 }
             }
         } catch (SQLException sqle) {
             salida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
         }
         return listaFiltro;
+    }
+    
+    public ConsultasDTO consultarFecha(Connection cnn) {
+        this.cnn = cnn;
+        ConsultasDTO c = null;
+        String salida = "";
+        try {
+            String querryFecha = " select concat( DAYNAME(now()),', ',DAYOFMONTH(now()),' de ', MONTHNAME(now()),' de ',year(now())) as fecha; ";
+            pstmt = cnn.prepareStatement(querryFecha);
+            rs = pstmt.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    c = new ConsultasDTO();
+                    c.setFecha(rs.getString("fecha"));
+                }
+            }
+        } catch (SQLException sqle) {
+            salida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
+        }
+        return c;
     }
 }

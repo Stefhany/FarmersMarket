@@ -12,7 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import utilidades.Conectar;
+import Conexion.Conection;
+import utilidades.MyException;
 
 /**
  *
@@ -22,16 +23,12 @@ public class UsuariosDAO {
 
     private Connection cnn = null;
     private PreparedStatement pstmt = null;
-    String mensaje = " ";
-    private int resultado = 0;
-    ResultSet resultadoSet = null;
+    private ResultSet rs = null;
 
-    public UsuariosDAO() {
-        cnn = Conectar.getInstance();
-    }
-
-    public String ingresarRegistro(UsuariosDTO usuario) {
-
+    public String ingresarRegistro(UsuariosDTO usuario, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String msgSalida = "";
         try {
             pstmt = cnn.prepareStatement("INSERT INTO usuarios VALUES (null,?, ?, ?, ?, ?, ?, md5(?), ?, ?, ?)");
             pstmt.setString(1, usuario.getNombres());
@@ -44,41 +41,37 @@ public class UsuariosDAO {
             pstmt.setBoolean(8, usuario.isNotificacion());
             pstmt.setString(9, usuario.getCiudad());
             pstmt.setString(10, usuario.getFechaNacimiento());
-            mensaje = pstmt.toString();
-            resultado = pstmt.executeUpdate();
-            if (resultado != 0) {
-                mensaje = "Se han modificado " + resultado + " registro satisfatoriamente ";
+            //mensaje = pstmt.toString();
+            rtdo = pstmt.executeUpdate();
+            if (rtdo != 0) {
+                msgSalida = "Se han modificado " + rtdo + " registro satisfatoriamente ";
             } else {
-                mensaje = "ha ocirrido in error en la creacion ";
+                msgSalida = "ha ocirrido in error en la creacion ";
             }
         } catch (SQLException sd) {
-            mensaje = " ocurrido un error en " + sd.getMessage();
+            msgSalida = " ocurrido un error en " + sd.getMessage();
         }
-        return mensaje;
+        return msgSalida;
     }
 
-    public String modificarUsuario(UsuariosDTO usuario) throws MyException {
-        String sal = " ";
+    public String modificarUsuario(UsuariosDTO usuario, Connection cnn) throws MyException {
+        this.cnn = cnn;
+        String sal = "";
         int res = 0;
         try {
-            String queryUpDateUser = " UPDATE usuarios SET nombres=?, apellidos=?, cedula=?, telefono=?, "
-                    + " direccion=?, correo=?, clave= md5(?), notificaciones=?, "
-                    + " ciudad=?, fechaNacimiento=? WHERE idUsuarios=?;";
+            String queryUpDateUser = " UPDATE usuarios SET telefono=?, "
+                    + " direccion=?, correo=?, "
+                    + " ciudad=? WHERE idUsuarios=?;";
             pstmt = cnn.prepareStatement(queryUpDateUser);
-            pstmt.setString(1, usuario.getNombres());
-            pstmt.setString(2, usuario.getApellidos());
-            pstmt.setInt(3, usuario.getCedula());
-            pstmt.setInt(4, usuario.getTelefono());
-            pstmt.setString(5, usuario.getDireccion());
-            pstmt.setString(6, usuario.getCorreo());
-            pstmt.setString(7, usuario.getClave());
-            pstmt.setBoolean(8, usuario.isNotificacion());
-            pstmt.setString(9, usuario.getCiudad());
-            pstmt.setString(10, usuario.getFechaNacimiento());
+            pstmt.setInt(1, usuario.getTelefono());
+            pstmt.setString(2, usuario.getDireccion());
+            pstmt.setString(3, usuario.getCorreo());
+            pstmt.setString(4, usuario.getCiudad());
+            pstmt.setInt(5, usuario.getIdUsuarios());
             res = pstmt.executeUpdate();
 
             if (res != 0) {
-                sal = "El campo se ha modificado: " + resultado + " satisfactoriamente.";
+                sal = "El campo se ha modificado: " + res + " satisfactoriamente.";
             } else {
                 sal = "Error";
             }
@@ -88,79 +81,79 @@ public class UsuariosDAO {
         return sal;
     }
 
-    public String eliminarUsuario(int id) {
-
+    public String eliminarUsuario(int id, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String msgSalida = "";
         try {
             pstmt = cnn.prepareStatement("delete from usuarios where idUsuarios=?;");
             pstmt.setInt(1, id);
-            resultado = pstmt.executeUpdate();
+            rtdo = pstmt.executeUpdate();
 
-            if (resultado != 0) {
-                mensaje = "El siguiente campo" + resultado + "se elimino Corretamente";
+            if (rtdo != 0) {
+                msgSalida = "El siguiente campo" + rtdo + "se elimino Corretamente";
             } else {
-                mensaje = "Ocurrio Un Error";
+                msgSalida = "Ocurrio Un Error";
             }
         } catch (SQLException sqlexception) {
-            mensaje = "Ocurrio un error" + sqlexception.getMessage();
-
+            msgSalida = "Ocurrio un error" + sqlexception.getMessage();
         }
-
-        return mensaje;
+        return msgSalida;
     }
 
-    public ArrayList<UsuariosDTO> consultarRegistros() {
+    public ArrayList<UsuariosDTO> consultarRegistros(Connection cnn) {
+        this.cnn = cnn;
         ArrayList<UsuariosDTO> listaUsuarios = new ArrayList<UsuariosDTO>();
         try {
-
-            pstmt = cnn.prepareStatement("SELECT idUsuarios, nombres, apellidos, cedula, telefono, direccion, correo, clave, notificaciones, ciudad, fechaNacimiento FROM usuarios;");
-
-            resultadoSet = pstmt.executeQuery();
-            if (resultadoSet != null) {
-                while (resultadoSet.next()) {
+            pstmt = cnn.prepareStatement("SELECT idUsuarios, nombres, apellidos, cedula, telefono, direccion, "
+                    + " correo, clave, notificaciones, ciudad, fechaNacimiento FROM usuarios;");
+            rs = pstmt.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
                     UsuariosDTO user = new UsuariosDTO();
-                    user.setIdUsuarios(resultadoSet.getInt("idUsuarios"));
-                    user.setNombres(resultadoSet.getString("nombres"));
-                    user.setApellidos(resultadoSet.getString("apellidos"));
-                    user.setCedula(resultadoSet.getInt("cedula"));
-                    user.setTelefono(resultadoSet.getInt("telefono"));
-                    user.setDireccion(resultadoSet.getString("direccion"));
-                    user.setCorreo(resultadoSet.getString("correo"));
-                    user.setClave(resultadoSet.getString("clave"));
-                    user.setNotificacion(resultadoSet.getBoolean("notificaciones"));
-                    user.setCiudad(resultadoSet.getString("ciudad"));
-                    user.setFechaNacimiento(resultadoSet.getString("fechaNacimiento"));
+                    user.setIdUsuarios(rs.getInt("idUsuarios"));
+                    user.setNombres(rs.getString("nombres"));
+                    user.setApellidos(rs.getString("apellidos"));
+                    user.setCedula(rs.getInt("cedula"));
+                    user.setTelefono(rs.getInt("telefono"));
+                    user.setDireccion(rs.getString("direccion"));
+                    user.setCorreo(rs.getString("correo"));
+                    user.setClave(rs.getString("clave"));
+                    user.setNotificacion(rs.getBoolean("notificaciones"));
+                    user.setCiudad(rs.getString("ciudad"));
+                    user.setFechaNacimiento(rs.getString("fechaNacimiento"));
                     listaUsuarios.add(user);
                 }
             }
         } catch (SQLException sqle) {
             System.out.println("Se ha producido la sig excepción: " + sqle.getMessage());
-
         }
         return listaUsuarios;
     }
 
-    public UsuariosDTO consultarUnRegistro(int id) {
+    public UsuariosDTO consultarUnRegistro(int id, Connection cnn) {
+        this.cnn = cnn;
         UsuariosDTO user = new UsuariosDTO();
         try {
-            pstmt = cnn.prepareStatement("SELECT idUsuarios, nombres, apellidos, cedula, telefono, direccion, correo, clave, notificaciones,ciudad, fechanacimiento "
-                    + "FROM usuarios WHERE idUsuarios = ?;");
+            pstmt = cnn.prepareStatement("SELECT idUsuarios, nombres, apellidos, cedula, telefono, "
+                    + " direccion, correo, clave, notificaciones,ciudad, fechanacimiento "
+                    + " FROM usuarios WHERE idUsuarios = ?;");
             pstmt.setInt(1, id);
-            resultadoSet = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
 
-            if (resultadoSet != null) {
-                while (resultadoSet.next()) {
-                    user.setIdUsuarios(resultadoSet.getInt("idUsuarios"));
-                    user.setNombres(resultadoSet.getString("nombres"));
-                    user.setApellidos(resultadoSet.getString("apellidos"));
-                    user.setCedula(resultadoSet.getInt("cedula"));
-                    user.setTelefono(resultadoSet.getInt("telefono"));
-                    user.setDireccion(resultadoSet.getString("direccion"));
-                    user.setCorreo(resultadoSet.getString("correo"));
-                    user.setClave(resultadoSet.getString("clave"));
-                    user.setNotificacion(resultadoSet.getBoolean("notificaciones"));
-                    user.setCiudad(resultadoSet.getString("ciudad"));
-                    user.setFechaNacimiento(resultadoSet.getString("Fechanacimiento"));
-
+            if (rs != null) {
+                while (rs.next()) {
+                    user.setIdUsuarios(rs.getInt("idUsuarios"));
+                    user.setNombres(rs.getString("nombres"));
+                    user.setApellidos(rs.getString("apellidos"));
+                    user.setCedula(rs.getInt("cedula"));
+                    user.setTelefono(rs.getInt("telefono"));
+                    user.setDireccion(rs.getString("direccion"));
+                    user.setCorreo(rs.getString("correo"));
+                    user.setClave(rs.getString("clave"));
+                    user.setNotificacion(rs.getBoolean("notificaciones"));
+                    user.setCiudad(rs.getString("ciudad"));
+                    user.setFechaNacimiento(rs.getString("Fechanacimiento"));
                 }
             }
         } catch (SQLException sqle) {
@@ -169,7 +162,8 @@ public class UsuariosDAO {
         return user;
     }
 
-    public UsuariosDTO validarUsuario(String correo, String pass) {
+    public UsuariosDTO validarUsuario(String correo, String pass, Connection cnn) {
+        this.cnn = cnn;
         UsuariosDTO udto = new UsuariosDTO();
         try {
             String querryValidation = " select idUsuarios as id, nombres, apellidos, cedula, telefono, "
@@ -178,45 +172,45 @@ public class UsuariosDAO {
             pstmt = cnn.prepareStatement(querryValidation);
             pstmt.setString(1, correo);
             pstmt.setString(2, pass);
-            resultadoSet = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
 
-            if (resultadoSet != null) {
-                while (resultadoSet.next()) {
-                    udto.setIdUsuarios(resultadoSet.getInt("id"));
-                    udto.setNombres(resultadoSet.getString("nombres"));
-                    udto.setApellidos(resultadoSet.getString("apellidos"));
-                    udto.setCedula(resultadoSet.getInt("cedula"));
-                    udto.setTelefono(resultadoSet.getInt("telefono"));
-                    udto.setDireccion(resultadoSet.getString("direccion"));
-                    udto.setCorreo(resultadoSet.getString("correo"));
-                    udto.setClave(resultadoSet.getString("clave"));
-                    udto.setNotificacion(resultadoSet.getBoolean("notificaciones"));
-                    udto.setCiudad(resultadoSet.getString("ciudad"));
-                    udto.setFechaNacimiento(resultadoSet.getString("fechaNacimiento"));
+            if (rs != null) {
+                while (rs.next()) {
+                    udto.setIdUsuarios(rs.getInt("id"));
+                    udto.setNombres(rs.getString("nombres"));
+                    udto.setApellidos(rs.getString("apellidos"));
+                    udto.setCedula(rs.getInt("cedula"));
+                    udto.setTelefono(rs.getInt("telefono"));
+                    udto.setDireccion(rs.getString("direccion"));
+                    udto.setCorreo(rs.getString("correo"));
+                    udto.setClave(rs.getString("clave"));
+                    udto.setNotificacion(rs.getBoolean("notificaciones"));
+                    udto.setCiudad(rs.getString("ciudad"));
+                    udto.setFechaNacimiento(rs.getString("fechaNacimiento"));
                 }
             } else {
                 udto = null;
             }
-
         } catch (SQLException ex) {
             System.out.println("Datos errones.. !!reviselos!!" + ex.getSQLState() + " - " + ex.getMessage());
         }
         return udto;
     }
 
-    public ArrayList<UsuariosDTO> mostrarPrueba() {
+    public ArrayList<UsuariosDTO> mostrarPrueba(Connection cnn) {
+        this.cnn = cnn;
         ArrayList<UsuariosDTO> usuarios = new ArrayList();
         try {
             String querryPrueba = ("SELECT nombres, apellidos, cedula, telefono FROM usuarios;");
             pstmt = cnn.prepareStatement(querryPrueba);
-            resultadoSet = pstmt.executeQuery();
-            if (resultadoSet != null) {
-                while (resultadoSet.next()) {
+            rs = pstmt.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
                     UsuariosDTO user = new UsuariosDTO();
-                    user.setNombres(resultadoSet.getString("nombres"));
-                    user.setApellidos(resultadoSet.getString("apellidos"));
-                    user.setCedula(resultadoSet.getInt("cedula"));
-                    user.setTelefono(resultadoSet.getInt("telefono"));
+                    user.setNombres(rs.getString("nombres"));
+                    user.setApellidos(rs.getString("apellidos"));
+                    user.setCedula(rs.getInt("cedula"));
+                    user.setTelefono(rs.getInt("telefono"));
                     usuarios.add(user);
                 }
             }
@@ -226,8 +220,9 @@ public class UsuariosDAO {
         return usuarios;
     }
 
-    public HashMap<UsuariosDTO, String> validarUsuarioV2(String correo, String pss) {
-        String menu = "<ul>";
+    public HashMap<UsuariosDTO, String> validarUsuarioV2(String correo, String pss, Connection cnn) {
+        this.cnn = cnn;
+        String menu = "<ul >";
         HashMap<UsuariosDTO, String> usuarioValidado = new HashMap<UsuariosDTO, String>();
         UsuariosDTO user = new UsuariosDTO();
         ResultSet rs = null;
@@ -250,29 +245,29 @@ public class UsuariosDAO {
             rs = pstmt.executeQuery();
             if (rs != null) {
                 while (rs.next()) {
-                    user.setIdUsuarios(resultadoSet.getInt("idUsuarios"));
-                    user.setNombres(resultadoSet.getString("nombres"));
-                    user.setApellidos(resultadoSet.getString("apellidos"));
-                    user.setCedula(resultadoSet.getInt("cedula"));
-                    user.setTelefono(resultadoSet.getInt("telefono"));
-                    user.setDireccion(resultadoSet.getString("direccion"));
-                    user.setCorreo(resultadoSet.getString("correo"));
-                    user.setClave(resultadoSet.getString("clave"));
-                    user.setNotificacion(resultadoSet.getBoolean("notificaciones"));
-                    user.setCiudad(resultadoSet.getString("ciudad"));
-                    user.setFechaNacimiento(resultadoSet.getString("Fechanacimiento"));
+                    user.setIdUsuarios(rs.getInt("idUsuarios"));
+                    user.setNombres(rs.getString("nombres"));
+                    user.setApellidos(rs.getString("apellidos"));
+                    user.setCedula(rs.getInt("cedula"));
+                    user.setTelefono(rs.getInt("telefono"));
+                    user.setDireccion(rs.getString("direccion"));
+                    user.setCorreo(rs.getString("correo"));
+                    user.setClave(rs.getString("clave"));
+                    user.setNotificacion(rs.getBoolean("notificaciones"));
+                    user.setCiudad(rs.getString("ciudad"));
+                    user.setFechaNacimiento(rs.getString("Fechanacimiento"));
                     menu += "<li>";
                     // menu+="<a href='"+rs.getString("url")+"'>"+rs.getString("descripcion")+"</a>";
                     menu += rs.getString("nombre");
                     ResultSet rsSub = cnn.prepareStatement(" SELECT p.idPermisos, p.nombre, p.url "
                             + " FROM permisos p INNER JOIN permisosroles pr ON p.idPermisos = pr.permisosId "
                             + " WHERE padre = " + rs.getInt("idPermisos")
-                            + " AND ru.rolesId = " + rs.getInt("idRoles")).executeQuery();
+                            + " AND pr.rolesId = " + rs.getInt("idRoles")).executeQuery();
 
-                    menu += "<ul>";
+                    menu += "<ul class=\"panel-body\">";
                     while (rsSub.next()) {
                         menu += "<li>";
-                        menu += "<a href='" + rsSub.getString("url") + "'>" + rsSub.getString("p.`nombre`") + "</a>";
+                        menu += "<a href='" + rsSub.getString("url") + "'>" + rsSub.getString("p.nombre") + "</a>";
                         menu += "</li>";
                     }
 

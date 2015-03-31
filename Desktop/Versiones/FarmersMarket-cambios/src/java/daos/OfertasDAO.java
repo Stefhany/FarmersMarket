@@ -19,7 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import utilidades.Conectar;
+import Conexion.Conection;
+import utilidades.MyException;
 
 /**
  *
@@ -27,16 +28,9 @@ import utilidades.Conectar;
  */
 public class OfertasDAO {
 
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    Connection cnn = null;
-    String salida = " ";
-    int resultado = 0;
-    OfertasDTO ofdto = new OfertasDTO();
-
-    public OfertasDAO() {
-        cnn = Conectar.getInstance();
-    }
+    private PreparedStatement pstmt = null;
+    private ResultSet rs = null;
+    private Connection cnn = null;
 
     /**
      * Insertar oferta nueva version
@@ -44,52 +38,61 @@ public class OfertasDAO {
      * @param nuevaOferta
      * @return
      */
-    public String insertarOferta(OfertasDTO nuevaOferta) {
+     public String insertarOferta(OfertasDTO nuevaOferta, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String msgSalida = "";
         try {
             pstmt = cnn.prepareStatement("INSERT INTO ofertas VALUES (null, ?,?,?,current_date(), date_add(curdate(), interval 15 day),1);");
             pstmt.setInt(1, nuevaOferta.getProductosAsociadosUsuariosId());
             pstmt.setInt(3, nuevaOferta.getCantidad());
             pstmt.setFloat(2, nuevaOferta.getPrecio());
-            resultado = pstmt.executeUpdate();
+            rtdo = pstmt.executeUpdate();
 
-            if (resultado != 0) {
-                salida = "El registro de la oferta " + resultado + " ha sido exitoso";
+            if (rtdo != 0) {
+                msgSalida = "El registro de la oferta " + rtdo + " ha sido exitoso";
             } else {
-                salida = "No se pudo realizar el registro";
+                msgSalida = "No se pudo realizar el registro";
             }
         } catch (SQLException sqle) {
-            salida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
+            msgSalida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
 
         }
-        return salida;
+        return msgSalida;
     }
 
-    public String modificarOferta(OfertasDTO modOferta) {
+    public String modificarOferta(OfertasDTO modOferta, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String msgSalida = "";
         try {
             pstmt = cnn.prepareStatement("UPDATE ofertas SET cantidad = ? WHERE idOfertas = ?;");
             pstmt.setInt(1, modOferta.getCantidad());
             pstmt.setInt(2, modOferta.getIdOfertas());
-            resultado = pstmt.executeUpdate();
+            rtdo = pstmt.executeUpdate();
 
-            if (resultado != 0) {
-                salida = "La modificación " + resultado + " se pudo realizar, exitosamente";
+            if (rtdo != 0) {
+                msgSalida = "La modificación " + rtdo + " se pudo realizar, exitosamente";
             } else {
-                salida = "No se pudo realizar la modificación";
+                msgSalida = "No se pudo realizar la modificación";
             }
         } catch (SQLException sqle) {
-            salida = "Ha ocurrido lo siguiente... " + sqle.getMessage();
+            msgSalida = "Ha ocurrido lo siguiente... " + sqle.getMessage();
         }
-        return salida;
+        return msgSalida;
     }
 
-    public String eliminarOferta(int id) {
+    public String eliminarOferta(int id, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String salida = "";
         try {
             pstmt = cnn.prepareStatement("DELETE FROM ofertas WHERE idOfertas = ?;");
             pstmt.setInt(1, id);
-            resultado = pstmt.executeUpdate();
+            rtdo = pstmt.executeUpdate();
 
-            if (resultado != 0) {
-                salida = "Registro " + resultado + " eliminado. Exitosamente";
+            if (rtdo != 0) {
+                salida = "Registro " + rtdo + " eliminado. Exitosamente";
             }
         } catch (SQLException sqle) {
             salida = "Ocurrio esta excepción " + sqle.getMessage();
@@ -97,8 +100,9 @@ public class OfertasDAO {
         return salida;
     }
 
-    public List<ProductoDTO> listarProductosAsociado(int id) {
-        ArrayList<ProductoDTO> productosAso = new ArrayList<ProductoDTO>();
+    public List<ProductoDTO> listarProductosAsociado(int id, Connection cnn) {
+        this.cnn = cnn;
+        ArrayList<ProductoDTO> productosAso = new ArrayList();
         try {
             String queryAllProductsAso = " SELECT idUsuarios as 'Id_productor', paso.idProductosAsociadosUsuarios as 'Id_productoAsociado', p.nombreProducto as 'Nombre' "
                     + " FROM usuarios u "
@@ -123,7 +127,8 @@ public class OfertasDAO {
         return productosAso;
     }
 
-    public List<OfertasDTO> consultarOfertas() {
+    public List<OfertasDTO> consultarOfertas(Connection cnn) {
+        this.cnn = cnn;
         LinkedList<OfertasDTO> ofer = new LinkedList();
 
         try {
@@ -150,14 +155,15 @@ public class OfertasDAO {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(OfertasDAO.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Ha ocurrido esto" + ex.getSQLState() + " - " + ex.getMessage());
         }
         return ofer;
     }
 
-    public OfertasDTO consultByOffer(int id) throws MyException {
+    public OfertasDTO consultByOffer(int id, Connection cnn) throws MyException {
+        this.cnn = cnn;
         OfertasDTO onlyoffer = null;
-        String msj = " ";
+        
         try {
             String querryByIdOffer = " select idCategorias, nombreCategoria, idOfertas,idProductosAsociadosUsuarios, "
                     + " idUsuarios, concat(u.nombres,' ',u.apellidos) as Productor, "
@@ -197,5 +203,110 @@ public class OfertasDAO {
             throw new MyException("Ups! Mira lo ocurrido... " + sqle.getMessage());
         }
         return onlyoffer;
+    }    
+    
+    public ArrayList<OfertasDTO> consultarMisOfertas(int idUser, Connection cnn) {
+        this.cnn = cnn;
+        ArrayList<OfertasDTO> ofertas = new ArrayList();
+        try {
+            pstmt = cnn.prepareStatement(" SELECT pro.idProductosAsociadosUsuarios as id, pro.usuariosId as idUsu, "
+                    + " pro.productosId as idPro, u.*, p.*, c.*, o.* "
+                    + " from categorias c "
+                    + " inner join productos p on c.idCategorias = p.categoriasId "
+                    + " inner join  productosasociadosusuarios  pro on "
+                    + " pro.productosId = p.idProductos "
+                    + " inner join usuarios u on pro.usuariosId = u.idUsuarios "
+                    + " inner join ofertas  o on "
+                    + " o.productosAsociadosUsuariosId = pro.idProductosAsociadosUsuarios "
+                    + " where pro.usuariosId = ?;");
+            pstmt.setInt(1, idUser);
+            rs = pstmt.executeQuery();
+
+            if (rs != null) {
+                while (rs.next()) {
+                    UsuariosDTO nUser = new UsuariosDTO();
+                    nUser.setCedula(rs.getInt("u.cedula"));
+                    nUser.setNombres(rs.getString("u.nombres"));
+                    CategoriaDTO c = new CategoriaDTO();
+                    c.setIdCategoria(rs.getInt("c.idCategorias"));
+                    c.setNombre(rs.getString("c.nombreCategoria"));
+                    ProductoDTO nProduct = new ProductoDTO(c);
+                    nProduct.setIdProductos(rs.getInt("p.idproductos"));
+                    nProduct.setNombre(rs.getString("p.nombreproducto"));
+                    ProductosAsociadosUsuariosDTO psodto = new ProductosAsociadosUsuariosDTO(nUser, nProduct);
+                    psodto.setIdProductosAsociadosUsuarios(rs.getInt("id"));
+                    OfertasDTO of = new OfertasDTO(psodto);
+                    of.setCantidad(rs.getInt("o.cantidad"));
+                    of.setPrecio(rs.getInt("o.precio"));
+                    of.setFechaFin(rs.getString("o.fechafin"));
+                    ofertas.add(of);
+                }
+            } else {
+                System.out.println("No se encuetran registros de productores asociados.. ");
+            }
+        } catch (SQLException sqle) {
+            System.out.println("Se ha producido esta excepción.. " + sqle.getMessage());
+        }
+        return ofertas;
+    }
+
+    public OfertasDTO consultMyOffer(int id, Connection cnn) throws MyException {
+        this.cnn = cnn;
+        OfertasDTO onlyoffer = null;
+        try {
+            String querryMyOffer = " SELECT pro.idProductosAsociadosUsuarios as id, pro.usuariosId as idUsu, "
+                    + " pro.productosId as idPro, u.*, p.*, c.*, o.* "
+                    + " from categorias c "
+                    + " inner join productos p on c.idCategorias = p.categoriasId "
+                    + " inner join  productosasociadosusuarios  pro on "
+                    + " pro.productosId = p.idProductos "
+                    + " inner join usuarios u on pro.usuariosId = u.idUsuarios "
+                    + " inner join ofertas  o on "
+                    + " o.productosAsociadosUsuariosId = pro.idProductosAsociadosUsuarios "
+                    + " where pro.idProductosAsociadosUsuarios = ?;";
+            pstmt = cnn.prepareStatement(querryMyOffer);
+            pstmt.setInt(1, id);
+            rs = pstmt.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    UsuariosDTO udto = new UsuariosDTO();
+                    udto.setIdUsuarios(rs.getInt("idUsu"));
+                    CategoriaDTO cdto = new CategoriaDTO(rs.getInt("idCategorias"), rs.getString("nombreCategoria"));
+                    ProductoDTO pdto = new ProductoDTO(rs.getInt("idProductos"), rs.getString("nombreProducto"), rs.getString("unidad"), cdto);
+                    ProductosAsociadosUsuariosDTO proAso = new ProductosAsociadosUsuariosDTO(udto, pdto);
+                    proAso.setIdProductosAsociadosUsuarios(rs.getInt("id"));
+                    onlyoffer = new OfertasDTO(proAso);
+                    onlyoffer.setIdOfertas(rs.getInt("idOfertas"));
+                    onlyoffer.setCantidad(rs.getInt("cantidad"));
+                    onlyoffer.setPrecio(rs.getInt("precio"));
+                }
+            } else {
+                throw new MyException("No se encuentran registros por este id.");
+            }
+        } catch (SQLException sqle) {
+            throw new MyException("Ups! Mira lo ocurrido... " + sqle.getMessage());
+        }
+        return onlyoffer;
+    }
+    
+    public String modificarMyOffer(OfertasDTO modOferta, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0; 
+        String salida = "";
+        try {
+            pstmt = cnn.prepareStatement("UPDATE ofertas SET cantidad = ? WHERE idOfertas = ?;");
+            pstmt.setInt(1, modOferta.getCantidad());
+            pstmt.setInt(2, modOferta.getIdOfertas());
+            rtdo = pstmt.executeUpdate();
+
+            if (rtdo != 0) {
+                salida = "La modificación " + rtdo + " se pudo realizar, exitosamente";
+            } else {
+                salida = "No se pudo realizar la modificación";
+            }
+        } catch (SQLException sqle) {
+            salida = "Ha ocurrido lo siguiente... " + sqle.getMessage();
+        }
+        return salida;
     }
 }

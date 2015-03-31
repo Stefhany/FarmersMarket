@@ -6,6 +6,7 @@
 package controlador;
 
 import daos.OfertasDAO;
+import daos.ProductosAsociadosUsuariosDAO;
 import dtos.OfertasDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -41,8 +42,26 @@ public class ControladorOfertas extends HttpServlet {
                 ofDto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
                 OfertasDAO ofDao = new OfertasDAO();
                 String salida = ofDao.modificarOferta(ofDto);
-                response.sendRedirect("index.jsp?msg= "+salida);                
-            }else {
+                response.sendRedirect("paginas/listarofertas.jsp?msg= "+salida);                
+            }else if (request.getParameter("btnModificarMiOferta") != null && request.getParameter("modificarMiOferta") != null) {
+                OfertasDTO ofDto = new OfertasDTO();
+                ofDto.setIdOfertas(Integer.parseInt(request.getParameter("txtIdOferta").trim()));
+                ofDto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
+                ProductosAsociadosUsuariosDAO proDao = new ProductosAsociadosUsuariosDAO();
+                String salida = proDao.modificarMyOffer(ofDto);
+                response.sendRedirect("paginas/misofertas.jsp?msg= "+salida);
+            }else if (request.getParameter("btnRegistrarOferta") != null && request.getParameter("registrarOferta") != null) {
+                OfertasDTO ofdto = new OfertasDTO();
+                OfertasDAO ofdao = new OfertasDAO();
+                ofdto.setProductosAsociadosUsuariosId(Integer.parseInt(request.getParameter("txtProductoAsociado").trim()));
+                ofdto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
+                ofdto.setPrecio(Float.parseFloat(request.getParameter("txtPrecio").trim()));
+                String salida = ofdao.insertarOferta(ofdto);
+                response.sendRedirect("paginas/perfil.jsp?msg= " + salida);
+
+            }           
+            
+            else {
                 out.print("Esta ingresando de forma fraudalenta!!");
             }
 //            out.println("<!DOCTYPE html>");

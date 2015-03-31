@@ -3,152 +3,58 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package daos;
 
+import dtos.CategoriaDTO;
+import dtos.OfertasDTO;
 import dtos.ProductoDTO;
 import dtos.ProductosAsociadosUsuariosDTO;
 import dtos.UsuariosDTO;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import utilidades.Conectar;
+import Conexion.Conection;
+import utilidades.MyException;
 
 /**
  *
  * @author krito
  */
 public class ProductosAsociadosUsuariosDAO {
-    
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    Connection cnn = null;
-    String salida = " ";
-    int resultado = 0;
-    ProductosAsociadosUsuariosDTO pasodto;
-    ArrayList<ProductosAsociadosUsuariosDTO> asociados = new ArrayList();
 
-    public ProductosAsociadosUsuariosDAO() {
-        cnn = Conectar.getInstance();
-    }
-//
-//    public String insertarProducto(ProductosAsociadosUsuariosDTO nuevoAsociado) {
-//        try {
-//            pstmt = cnn.prepareStatement("INSERT INTO productosAsociadosUsuarios VALUES (null, ?,?);");
-//            pstmt.setInt(1, nuevoAsociado.getUsuariosId());
-//            pstmt.setInt(2, nuevoAsociado.getProductosId());
-//            resultado = pstmt.executeUpdate();
-//
-//            if (resultado != 0) {
-//                salida = "El registro del producto " + resultado + " ha sido exitoso";
-//            } else {
-//                salida = "No se pudo realizar el registro";
-//            }
-//        } catch (SQLException sqle) {
-//            salida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
-//
-//        }
-//        return salida;
-//    }
-//
-//    public String modificarProducto(ProductosAsociadosUsuariosDTO modAsociado) {
-//        try {
-//            pstmt = cnn.prepareStatement("UPDATE productosAsociadosUsuarios SET usuariosId = ?, productosId = ? WHERE idProductosAsociadosUsuarios = ?;");
-//            pstmt.setInt(1, modAsociado.getUsuariosId());
-//            pstmt.setInt(2, modAsociado.getProductosId());
-//            resultado = pstmt.executeUpdate();
-//
-//            if (resultado != 0) {
-//                salida = "La modificación " + resultado + " se pudo realizar, exitosamente";
-//            } else {
-//                salida = "No se pudo realizar la modificación";
-//            }
-//        } catch (SQLException sqle) {
-//            salida = "Ha ocurrido lo siguiente... " + sqle.getMessage();
-//        }
-//        return salida;
-//    }
-//
-//    public ArrayList<ProductosAsociadosUsuariosDTO> listarProductoresAsociados() {
-//        try {
-//            pstmt = cnn.prepareStatement("SELECT idProductosAsociadosUsuarios as id, usuariosId as idUsu, productosId as idPro FROM productosAsociadosUsuarios;");
-//            rs = pstmt.executeQuery();
-//
-//            if (rs != null) {
-//                while (rs.next()) {
-//                    ProductosAsociadosUsuariosDTO psodto = new ProductosAsociadosUsuariosDTO();
-//                    psodto.setIdProductosAsociadosUsuarios(rs.getInt("id"));
-//                    psodto.setUsuariosId(rs.getInt("idUsu"));
-//                    psodto.setProductosId(rs.getInt("idPro"));
-//                    asociados.add(psodto);
-//                }
-//            } else {
-//                System.out.println("No se encuetran registros de productores asociados.. ");
-//            }
-//        } catch (SQLException sqle) {
-//            System.out.println("Se ha producido esta excepción.. " + sqle.getMessage());
-//        }
-//        return asociados;
-//    }
-//
-//    public String eliminarAsociado(int id) {
-//        try {
-//            pstmt = cnn.prepareStatement("DELETE FROM productosAsociadosUsuarios WHERE idProductosAsociadosUsuarios = ?;");
-//            pstmt.setInt(1, id);
-//            resultado = pstmt.executeUpdate();
-//
-//            if (resultado != 0) {
-//                salida = "Registro " + resultado + " eliminado. Exitosamente";
-//            }
-//        } catch (SQLException sqle) {
-//            salida = "Ocurrio esta excepción " + sqle.getMessage();
-//        }
-//        return salida;
-//    }
-//
-//    public ProductosAsociadosUsuariosDTO consultarById(int id) {
-//        try {
-//            pstmt = cnn.prepareStatement("SELECT idProductosAsociadosUsuarios as id, usuariosId as idUsu, productosId as idPro FROM productosAsociadosUsuarios WHERE idProductosAsociadosUsuarios = ?;");
-//            rs = pstmt.executeQuery();
-//            if (rs != null) {
-//                while (rs.next()) {
-//                    pasodto.setIdProductosAsociadosUsuarios(rs.getInt("id"));
-//                    pasodto.setUsuariosId(rs.getInt("idUsu"));
-//                    pasodto.setProductosId(rs.getInt("idPro"));
-//                }
-//            } else {
-//                System.out.println("No hay registros, por esa busqueda... ");
-//            }
-//        } catch (SQLException sqle) {
-//            System.out.println("Ups! Mira lo ocurrido... " + sqle.getMessage());
-//        }
-//        return pasodto;
-//    }
-    public ArrayList<ProductosAsociadosUsuariosDTO> listarProductosByUser(int idUser) {
+    private PreparedStatement pstmt = null;
+    private ResultSet rs = null;
+    private Connection cnn = null;
+    private CallableStatement cllstmt = null;
+
+    public ArrayList<ProductosAsociadosUsuariosDTO> listarProductosByUser(int idUser, Connection cnn) {
+        this.cnn = cnn;
+        ArrayList<ProductosAsociadosUsuariosDTO> asociados = new ArrayList();
         try {
-            pstmt = cnn.prepareStatement("SELECT idProductosAsociadosUsuarios as id, usuariosId as idUsu, productosId as idPro, u.*, p.* "
+            pstmt = cnn.prepareStatement(" SELECT idProductosAsociadosUsuarios as id, usuariosId as idUsu, productosId as idPro, u.*, p.*, c.* "
                     + " FROM productosAsociadosUsuarios pa inner join usuarios u ON pa.usuariosid= u.idusuarios "
                     + " INNER JOIN productos p ON pa.productosId = p.idproductos "
-                    + " WHERE usuariosId = ?;");
+                    + " INNER JOIN categorias c ON p.categoriasId = c.idCategorias "
+                    + " WHERE usuariosId = ? "
+                    + " order by p.idproductos;");
             pstmt.setInt(1, idUser);
             rs = pstmt.executeQuery();
 
             if (rs != null) {
                 while (rs.next()) {
-                    
-                    //tener presente que se debe colocar los campos en la consulta y pasarlos todos
-                    //a las clases
                     UsuariosDTO nUser = new UsuariosDTO();
+                    nUser.setIdUsuarios(rs.getInt("u.idUsuarios"));
                     nUser.setCedula(rs.getInt("u.cedula"));
                     nUser.setNombres(rs.getString("u.nombres"));
-                    ProductoDTO nProduct = new ProductoDTO();
+                    CategoriaDTO c = new CategoriaDTO(rs.getInt("c.idCategorias"), rs.getString("nombreCategoria"));
+                    ProductoDTO nProduct = new ProductoDTO(c);
                     nProduct.setIdProductos(rs.getInt("p.idproductos"));
-                    nProduct.setNombre(rs.getString("p.nombreproducto"));         
-                    
+                    nProduct.setNombre(rs.getString("p.nombreproducto"));
                     ProductosAsociadosUsuariosDTO psodto = new ProductosAsociadosUsuariosDTO(nUser, nProduct);
-                    psodto.setIdProductosAsociadosUsuarios(rs.getInt("id"));                    
+                    psodto.setIdProductosAsociadosUsuarios(rs.getInt("id"));
                     asociados.add(psodto);
                 }
             } else {
@@ -159,9 +65,83 @@ public class ProductosAsociadosUsuariosDAO {
         }
         return asociados;
     }
-  
+
+    public ArrayList<ProductosAsociadosUsuariosDTO> consultarMisProductos(int idUser, Connection cnn) {
+        this.cnn = cnn;
+        ArrayList<ProductosAsociadosUsuariosDTO> misProductos = new ArrayList();
+        try {
+            pstmt = cnn.prepareStatement("SELECT idProductosAsociadosUsuarios as id, usuariosId as idUsu, "
+                    + " productosId as idPro, u.*, p.*, c.* "
+                    + " FROM productosAsociadosUsuarios pa inner join usuarios u ON pa.usuariosid= u.idusuarios "
+                    + " INNER JOIN productos p ON pa.productosId = p.idproductos "
+                    + " INNER JOIN categorias c on c.idCategorias = p.categoriasId "
+                    + " WHERE usuariosId = ?;");
+            pstmt.setInt(1, idUser);
+            rs = pstmt.executeQuery();
+
+            if (rs != null) {
+                while (rs.next()) {
+                    UsuariosDTO nUser = new UsuariosDTO();
+                    nUser.setCedula(rs.getInt("u.cedula"));
+                    nUser.setNombres(rs.getString("u.nombres"));
+                    CategoriaDTO c = new CategoriaDTO();
+                    c.setIdCategoria(rs.getInt("c.idCategorias"));
+                    c.setNombre(rs.getString("c.nombreCategoria"));
+                    ProductoDTO nProduct = new ProductoDTO(c);
+                    nProduct.setIdProductos(rs.getInt("p.idproductos"));
+                    nProduct.setNombre(rs.getString("p.nombreproducto"));
+                    ProductosAsociadosUsuariosDTO psodto = new ProductosAsociadosUsuariosDTO(nUser, nProduct);
+                    psodto.setIdProductosAsociadosUsuarios(rs.getInt("id"));
+                    misProductos.add(psodto);
+                }
+            } else {
+                System.out.println("No se encuetran registros de productores asociados.. ");
+            }
+        } catch (SQLException sqle) {
+            System.out.println("Se ha producido esta excepción.. " + sqle.getMessage());
+        }
+        return misProductos;
+    }
     
+    public String eliminarProAso(int id, Connection cnn) {
+        this.cnn = cnn;
+        int rtdo = 0;
+        String msgSalida = "";
+        try {
+            pstmt = cnn.prepareStatement("DELETE FROM productosasociadosusuarios WHERE idProductosAsociadosUsuarios = ?;");
+            pstmt.setInt(1, id);
+            rtdo = pstmt.executeUpdate();
+
+            if (rtdo != 0) {
+                msgSalida = "Registro " + rtdo + " eliminado. Exitosamente";
+            }
+        } catch (SQLException sqle) {
+            msgSalida = "Ocurrio esta excepción " + sqle.getMessage();
+        }
+        return msgSalida;
+    }
     
-    
-    
+    public String insertarProductoAsociado(String nomProducto, int categoria,int idUsuario, Connection cnn) {
+        this.cnn = cnn;
+        int sal = 0;
+        String res = "";
+        try {
+            cllstmt = cnn.prepareCall("{call ps_registrarProductoV5 (?,?,?,?)}");
+            cllstmt.setString(1, nomProducto);
+            cllstmt.setInt(2, categoria);
+            cllstmt.setInt(3, idUsuario);
+            cllstmt.registerOutParameter(4, java.sql.Types.INTEGER);
+            cllstmt.execute();
+            sal = cllstmt.getInt(4);
+
+            if (sal == 1) {
+                res = "Registro exitoso";
+            }  else {
+                res = "Something was wrong!!!";
+            }
+        } catch (SQLException sqle) {
+            res = "Pilas! Ocurrio la siguiente excepción " + sqle.getMessage();
+        }
+        return res;
+    }
 }

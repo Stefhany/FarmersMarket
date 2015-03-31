@@ -11,7 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import utilidades.Conectar;
+import Conexion.Conection;
 
 /**
  *
@@ -19,18 +19,15 @@ import utilidades.Conectar;
  */
 public class PedidoSobreOfertaDAO {
 
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    Connection cnn = null;
-    CallableStatement cllstmt = null;
-
-    public PedidoSobreOfertaDAO() {
-        cnn = Conectar.getInstance();
-    }
+    private PreparedStatement pstmt = null;
+    private ResultSet rs = null;
+    private Connection cnn = null;
+    private CallableStatement cllstmt = null;
     
-    public String insertarPedidoSobreOferta(int cantidadPedida, int idOferta, String fechaSolicitud){
+    public String insertarPedidoSobreOferta(int cantidadPedida, int idOferta, String fechaSolicitud, Connection cnn){
+        this.cnn = cnn;
         int salida = 0;
-        String mensaje = " ";
+        String mensaje = "";
         try {
             String procedureOrder = "{call ps_registrarPedidov1 (?,?,?,?)}";
             cllstmt = cnn.prepareCall(procedureOrder);

@@ -13,13 +13,14 @@ package dtos;
 public class OfertasDTO {
 
     private int idOfertas = 0;
-    private String nombre = " ";   // en esta version es innecesario
+    private String nombre = "";   // en esta version es innecesario
     private int cantidad = 0;
     private float precio = 0;
     private int productosAsociadosUsuariosId=0;    
     private ProductoDTO products = null;   // no se usa en esta versión
     private UsuariosDTO user = null;    // no se usa en esta versión
     private ProductosAsociadosUsuariosDTO idAso = null;
+    private String fechaFin = "";
     
     public OfertasDTO(){
         
@@ -171,5 +172,19 @@ public class OfertasDTO {
      */
     public void setIdAso(ProductosAsociadosUsuariosDTO idAso) {
         this.idAso = idAso;
+    }
+
+    /**
+     * @return the fechaFin
+     */
+    public String getFechaFin() {
+        return fechaFin;
+    }
+
+    /**
+     * @param fechaFin the fechaFin to set
+     */
+    public void setFechaFin(String fechaFin) {
+        this.fechaFin = fechaFin;
     }
 }

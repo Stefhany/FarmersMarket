@@ -6,7 +6,7 @@
     </servlet>
     <servlet>
         <servlet-name>Reporte</servlet-name>
-        <servlet-class>controlador.Reporte</servlet-class>
+        <servlet-class>Reportes.Reporte</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>NewServlet</servlet-name>
@@ -27,6 +27,34 @@
     <servlet>
         <servlet-name>ControladorUsuarios</servlet-name>
         <servlet-class>controlador.ControladorUsuarios</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>IngresarPermisos</servlet-name>
+        <servlet-class>controlador.IngresarPermisos</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ControladorRol</servlet-name>
+        <servlet-class>controlador.ControladorRol</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Operaciones</servlet-name>
+        <servlet-class>controlador.Operaciones</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ControladorProductos</servlet-name>
+        <servlet-class>controlador.ControladorProductos</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PoolSigaa</servlet-name>
+        <servlet-class>Conexion.PoolSigaa</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Conectar</servlet-name>
+        <servlet-class>Conexion.Conectar</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Conection</servlet-name>
+        <servlet-class>Conexion.Conection</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Controlador</servlet-name>
@@ -56,9 +84,41 @@
         <servlet-name>ControladorUsuarios</servlet-name>
         <url-pattern>/cu</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>IngresarPermisos</servlet-name>
+        <url-pattern>/cip</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ControladorRol</servlet-name>
+        <url-pattern>/cr</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Operaciones</servlet-name>
+        <url-pattern>/o</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ControladorProductos</servlet-name>
+        <url-pattern>/cpro</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PoolSigaa</servlet-name>
+        <url-pattern>/ps</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Conectar</servlet-name>
+        <url-pattern>/cnn</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Conection</servlet-name>
+        <url-pattern>/conn</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error404.jsp</location>
+    </error-page>
 </web-app>

@@ -7,7 +7,7 @@ package controlador;
 
 import daos.MyException;
 import daos.OfertasDAO;
-import daos.PedidosDAO;
+import modelo.dao.PedidosDAO;
 import daos.ProductoDAO;
 import daos.UsuariosDAO;
 import dtos.CategoriaDTO;
@@ -49,27 +49,16 @@ public class Controlador extends HttpServlet {
         PrintWriter out = response.getWriter();
         String salida = " ";
         try {
-            if (request.getParameter("btnRegistrar") != null && request.getParameter("registrar") != null) {
-                ProductoDTO pdto = new ProductoDTO();
-                ProductoDAO pdao = new ProductoDAO();
-                CategoriaDTO cdto = new CategoriaDTO();
-                pdto.setNombre(request.getParameter("txtNombre").trim());
-                pdto.setUnidad(request.getParameter("txtUnidad").trim());
-                cdto.setIdCategoria(Integer.parseInt(request.getParameter("txtCategoria").trim()));
-                pdto.setCategoriaId(cdto);
-                salida = pdao.insertarProducto(pdto);
-                response.sendRedirect("index.jsp?msg= " + salida);
-                
-            } else if (request.getParameter("btnRegistrarOferta") != null && request.getParameter("registrarOferta") != null) {
+            if (request.getParameter("btnRegistrarOferta") != null && request.getParameter("registrarOferta") != null) {
                 OfertasDTO ofdto = new OfertasDTO();
                 OfertasDAO ofdao = new OfertasDAO();
                 ofdto.setProductosAsociadosUsuariosId(Integer.parseInt(request.getParameter("txtProductoAsociado").trim()));
-                //ofdto.setNombre(request.getParameter("txtProducto").trim());
+                
                 ofdto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
                 ofdto.setPrecio(Float.parseFloat(request.getParameter("txtPrecio").trim()));
-                //ofdto.setProductosAsociadosUsuariosId(Integer.parseInt(request.getParameter("txtId").trim()));
+                
                 salida = ofdao.insertarOferta(ofdto);
-                response.sendRedirect("index.jsp?msg= " + salida);
+                response.sendRedirect("paginas/perfil.jsp?msg= " + salida);
 
             } else if (request.getParameter("btnActualizarProducto") != null && request.getParameter("actualizarProducto") != null) {
                 ProductoDTO prdto = new ProductoDTO();
@@ -79,18 +68,18 @@ public class Controlador extends HttpServlet {
                 ProductoDAO prdao = new ProductoDAO();
                 salida = prdao.modificarProducto(prdto);
                 //out.print(salida);
-                response.sendRedirect("index.jsp?msg=" + salida);
-            } else if (request.getParameter("btnIngresarSistema") != null && request.getParameter("ingresarSistema") != null) {
-                UsuariosDAO udao = new UsuariosDAO();
-                UsuariosDTO udto = new UsuariosDTO();
-                udto = udao.validarUsuario(request.getParameter("txtCorreo"), request.getParameter("txtClave"));
-                if (udto.getIdUsuarios() != 0) {
-                    HttpSession miSesion = request.getSession(true);
-                    miSesion.setAttribute("usuarioLogueado", udto);
-                    response.sendRedirect("indexproductor.jsp");
-                } else {
-                    response.sendRedirect("paginas/login.jsp?msg=Usuario No existe!!");
-                }
+                response.sendRedirect("paginas/perfil.jsp?msg=" + salida);
+//            } else if (request.getParameter("btnIngresarSistema") != null && request.getParameter("ingresarSistema") != null) {
+//                UsuariosDAO udao = new UsuariosDAO();
+//                UsuariosDTO udto = new UsuariosDTO();
+//                udto = udao.validarUsuario(request.getParameter("txtCorreo"), request.getParameter("txtClave"));
+//                if (udto.getIdUsuarios() != 0) {
+//                    HttpSession miSesion = request.getSession(true);
+//                    miSesion.setAttribute("usuarioLogueado", udto);
+//                    response.sendRedirect("indexproductor.jsp");
+//                } else {
+//                    response.sendRedirect("paginas/login.jsp?msg=Usuario No existe!!");
+//                }
             } else if (request.getParameter("btnRegistrarUsuario") != null && request.getParameter("rUsuario") != null) {
 
                 UsuariosDTO udto = new UsuariosDTO();
@@ -116,23 +105,8 @@ public class Controlador extends HttpServlet {
 //                out.println(udto.getFechaNacimiento());
                 UsuariosDAO dao = new UsuariosDAO();
                 salida = dao.ingresarRegistro(udto);
-                response.sendRedirect("index.jsp?msg=" + salida);
+                response.sendRedirect("login.jsp?msg=" + salida);
 
-            } else if (request.getParameter("btnModificarUsuario") != null && request.getParameter("modificarUsuario") != null) {
-                UsuariosDTO userdto = new UsuariosDTO();
-                userdto.setNombres(request.getParameter("txtNombres").trim());
-                userdto.setApellidos(request.getParameter("txtApellidos").trim());
-                userdto.setCedula(Integer.parseInt(request.getParameter("txtCedula").trim()));
-                userdto.setTelefono(Integer.parseInt(request.getParameter("txtTelefono").trim()));
-                userdto.setDireccion(request.getParameter("txtDireccion").trim());
-                userdto.setCorreo(request.getParameter("txtCorreo").trim());
-                userdto.setClave(request.getParameter("txtClave").trim());
-                userdto.setCiudad(request.getParameter("txtCiudad").trim());
-                userdto.setFechaNacimiento(request.getParameter("txtFechaNacimiento").trim());
-                UsuariosDAO userdao = new UsuariosDAO();
-                String sal = userdao.modificarUsuario(userdto);
-                response.sendRedirect("index.jsp?msg= "+sal);
-            
             } else if (request.getParameter("idUsuario") != null) {
                 UsuariosDAO userdao = new UsuariosDAO();
                 String sal = ""; 

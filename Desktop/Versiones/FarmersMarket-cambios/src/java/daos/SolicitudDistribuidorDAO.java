@@ -95,12 +95,8 @@ public class SolicitudDistribuidorDAO {
             rs = pstmt.executeQuery();
             if (rs != null) {
                 while (rs.next()) {
-                    UsuariosDTO user = new UsuariosDTO();
-                    user.setIdUsuarios(rs.getInt("idUsuarios"));
-                    user.setNombres(rs.getString("Distribuidor"));
-                    ProductoDTO pro = new ProductoDTO();
-                    pro.setIdProductos(rs.getInt("idProductos"));
-                    pro.setNombre(rs.getString("nombreProducto"));
+                    UsuariosDTO user = new UsuariosDTO(rs.getInt("idUsuarios"), rs.getString("Distribuidor"));
+                    ProductoDTO pro = new ProductoDTO(rs.getInt("idProductos"), rs.getString("nombreProducto"));
                     solicitud = new SolicitudDistribuidorDTO(user, pro);
                     solicitud.setIdSolicitud(rs.getInt("idSolicitudDistribuidor"));
                     solicitud.setCantidadSolicitada(rs.getInt("cantidadSolicitada"));

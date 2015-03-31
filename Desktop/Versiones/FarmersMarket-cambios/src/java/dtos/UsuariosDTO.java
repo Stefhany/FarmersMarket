@@ -52,6 +52,12 @@ public class UsuariosDTO {
         this.nombres = nom;
     }
     
+    public UsuariosDTO(int id, String nom, String dir){
+        this.idUsuarios = id;
+        this.nombres = nom;
+        this.direccion = dir;
+    }
+    
     /**
      * @return the idUsuarios
      */

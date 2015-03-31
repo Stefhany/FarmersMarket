@@ -6,6 +6,7 @@
 package controlador;
 
 import daos.Consultas;
+import dtos.OfertasDTO;
 import dtos.ProductosAsociadosUsuariosDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,58 +38,68 @@ public class ControladorConsultas extends HttpServlet {
             throws ServletException, IOException {
         PrintWriter out = response.getWriter();
         try {
+            String filtro = "";
+
+            if (request.getParameter("txtProductor") != null && request.getParameter("txtProductor") != "") {
+
+                filtro += " WHERE nombres like('%" + request.getParameter("txtProductor") + "%')";
+            } else {
+                filtro += " WHERE nombres like('%')";
+            }
+
+            if (request.getParameter("txtProducto") != null && request.getParameter("txtProducto") != "") {
+
+                filtro += " AND nombreProducto like('%" + request.getParameter("txtProducto") + "%')";
+            }
+
+            if (request.getParameter("txtFecha") != null && request.getParameter("txtFecha") != "") {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                sdf.format(Date.valueOf(LocalDate.MIN));
-                
-                
-                String filtro = "";
+                //sdf.format(Date.valueOf(request.getParameter("txtFecha"))).toString();
+                String fecha = request.getParameter("txtFecha");
+                filtro += " AND FechaFin BETWEEN CURRENT_DATE and '" + fecha + "'";
+            }
+            // 
+            //llamar al metodo   
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>SIGAA Consultar </title>");
+            out.println("</head>");
+            out.println("<body>");
 
-                if (request.getParameter("txtProductor") != null && request.getParameter("txtProductor") != "") {
+            //out.print("ksdvjsdvjj kjsnva ios"+filtro); 
+            out.println("<table border='1'>");
+            out.println("<tr>");
+            out.println("<th>Nombre productor</th>");
+            out.println("<th>Nombre producto</th>");
+            out.println("<th>Fecha de la oferta</th>");
+            out.println("</tr>");
+            Consultas con = new Consultas();
+            LinkedList<OfertasDTO> filtrar = new LinkedList();
+            filtrar = (LinkedList<OfertasDTO>) con.consultarFiltro(filtro);
 
-                    filtro += " WHERE nombres like('%" + request.getParameter("txtProductor") + "%')";
-                } else {
-                    filtro += " WHERE nombres like('%')";
-                }
-
-                if (request.getParameter("txtProducto") != null && request.getParameter("txtProducto") != "") {
-
-                    filtro += " AND nombreProducto like('%" + request.getParameter("txtProducto") + "%')";
-                }
-
-                if (request.getParameter("txtFecha") != null && request.getParameter("txtFecha") != "") {
-
-                    filtro += " AND FechaFin BETWEEN CURRENT_DATE and " + sdf;
-                }
-
-                //llamar al metodo   
-                out.println("<html>");
-                out.println("<head>");
-                out.println("<title>Ejemplo de filtro </title>");
-                out.println("</head>");
-                out.println("<body>");
-                out.println("<table>");
-                out.println("<tr>");
-                out.println("<th>Nombre productor</th>");
-                out.println("<th>Nombre producto</th>");
-                //out.println("<th>Fecha de la oferta</th>");
-                out.println("</tr>");
-                Consultas con = new Consultas();
-                LinkedList<ProductosAsociadosUsuariosDTO> filtrar = new LinkedList();
-                filtrar = (LinkedList<ProductosAsociadosUsuariosDTO>) con.consultarFiltro(filtro);
-                out.print(filtrar.size());
+            //out.print(filtrar.size());
+            if (filtrar.size() != 0) {
                 for (int i = 0; i < filtrar.size(); i++) {
                     out.println("<tr>");
-                    out.println("<td>" + filtrar.get(i).getUsuario().getNombres() + "</td>");
-                    out.println("<td>" + filtrar.get(i).getProducto().getNombre() + "</td>");
+                    out.println("<td>" + filtrar.get(i).getIdAso().getUsuario().getNombres() + "</td>");
+                    out.println("<td>" + filtrar.get(i).getIdAso().getProducto().getNombre() + "</td>");
+                    out.println("<td>" + filtrar.get(i).getFechaFin() + "</td>");
                     out.println("</tr>");
                 }
+            } else {
+                out.println("<tr>");
+                out.println("<td>No se encontraron registros.</td>");
+                out.println("<td>No se encontraron registros.</td>");
+                out.println("<td>No se encontraron registros.</td>");
+                out.println("</tr>");
+            }
 
-                out.println("</table>");
+            out.println("</table>");
 //            out.println("<h2> Consultar !</h2>");
 //            out.println("<h3>EL FILTRO PARA LA CONSULTAR ES ;<br /> </h3><H1>" + con.listarSolicitudesDeAsociacion(filtro) + "</h1>");
-                out.println("</body>");
-                out.println("</html>");
-            
+            out.println("</body>");
+            out.println("</html>");
+
         } finally {
             out.close();
         }

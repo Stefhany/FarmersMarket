@@ -14,44 +14,38 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import utilidades.Conectar;
+import Conexion.Conection;
+import utilidades.MyException;
 
 /**
  *
  * @author krito
  */
 public class CategoriaDAO {
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    Connection cnn = null;
-    String salida = " ";
-    int resultado = 0;
-    CategoriaDTO cdto = new CategoriaDTO();
-    ArrayList <CategoriaDTO> categorias = new ArrayList<>();
+    private PreparedStatement pstmt = null;
+    private ResultSet rs = null;   
+    private Connection cnn = null;
 
-    public CategoriaDAO() {
-        cnn = Conectar.getInstance();
-    }
-
-    public String insertarCategoria(CategoriaDTO nuevaCategoria) {
-        try {
-            pstmt = cnn.prepareStatement("INSERT INTO categorias VALUES (null, ?);");
-            pstmt.setString(1, nuevaCategoria.getNombre());
-            resultado = pstmt.executeUpdate();
-
-            if (resultado != 0) {
-                salida = "El registro de la categoria " + resultado + " ha sido exitoso";
-            } else {
-                salida = "No se pudo realizar el registro";
-            }
-        } catch (SQLException sqle) {
-            salida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
-
+    public String registrarCategoria(CategoriaDTO p, Connection cnn) throws SQLException {
+        this.cnn = cnn;
+        String msgSalida; 
+        int rtdo;  
+        pstmt = cnn.prepareStatement("INSERT INTO categorias VALUES (NULL, ?) ");
+        pstmt.setString(1, p.getNombre());
+        rtdo = pstmt.executeUpdate();
+        if (rtdo > 0) {
+            msgSalida = "se modificaron (" + rtdo + ") registros";
+        } else {
+            msgSalida = "NO se pudo actualizar el registro";
         }
-        return salida;
+        return msgSalida;
     }
+    
 
-    public String modificarCategoria(CategoriaDTO modCategoria) {
+    public String modificarCategoria(CategoriaDTO modCategoria, Connection cnn) {
+        this.cnn = cnn;
+        int resultado = 0;
+        String salida = "";
         try{
         pstmt = cnn.prepareStatement("UPDATE categorias SET nombre = ? WHERE idcategorias = ?;");
         pstmt.setString(1, modCategoria.getNombre());
@@ -68,7 +62,9 @@ public class CategoriaDAO {
         return salida;
     }
     
-    public ArrayList<CategoriaDTO> listarCategorias(){
+    public ArrayList<CategoriaDTO> listarCategorias(Connection cnn){
+        ArrayList<CategoriaDTO> categorias = new ArrayList();
+        this.cnn = cnn;
         try{
         pstmt = cnn.prepareStatement("SELECT idCategorias as id, nombreCategoria FROM categorias;");
         rs = pstmt.executeQuery();
@@ -89,30 +85,34 @@ public class CategoriaDAO {
         return categorias;
     }
     
-    public String eliminarCategoria(int id){
+    public String eliminarCategoria(int id, Connection cnn){
+        this.cnn = cnn;
+        int rto = 0;
+        String msgSalida = "";
         try{
             pstmt = cnn.prepareStatement("DELETE FROM categorias WHERE idCategorias = ?;");
             pstmt.setInt(1, id);
-            resultado = pstmt.executeUpdate();
+            rto = pstmt.executeUpdate();
             
-            if (resultado != 0) {
-                salida = "Registro " + resultado + " eliminado. Exitosamente";
+            if (rto != 0) {
+                msgSalida = "Registro " + rto + " eliminado. Exitosamente";
             }
         }catch (SQLException sqle){
-            salida = "Ocurrio esta excepción "+sqle.getMessage();
+            msgSalida = "Ocurrio esta excepción "+sqle.getMessage();
         }
-        return salida;
+        return msgSalida;
     }
     
-    public CategoriaDTO consultarById(int id){
+    public CategoriaDTO consultarById(int id, Connection cnn){
+        this.cnn = cnn;
+        CategoriaDTO cdto = null;
         try{
             pstmt = cnn.prepareStatement("SELECT idCategorias as id, nombre FROM categorias WHERE idCategorias = ?;");
             pstmt.setInt(1, id);
             rs = pstmt.executeQuery();
             if (rs != null) {
                 while(rs.next()){
-                    cdto.setIdCategoria(rs.getInt("id"));
-                    cdto.setNombre(rs.getString("nombre"));
+                    cdto = new CategoriaDTO(rs.getInt("id"), rs.getString("nombre")); 
                 }
             }else{
                 System.out.println("No hay registros... ");
@@ -126,7 +126,8 @@ public class CategoriaDAO {
     /*
     * Listar las categorías que se encuentran en el sistema.
     */
-    public LinkedList<CategoriaDTO> listarCategorias2() throws MyException, SQLException {
+    public LinkedList<CategoriaDTO> listarCategorias2(Connection cnn) throws MyException, SQLException {
+        this.cnn = cnn;
         LinkedList<CategoriaDTO> listaCategory = new LinkedList<>();
         try {
             String query = "SELECT  idcategorias as id, nombreCategoria "                    
@@ -149,12 +150,12 @@ public class CategoriaDAO {
     }
     /**
      * 
-     * Este metodo se hace para realzar la lista dependiente
+     * Este metodo se hace para realizar la lista dependiente
      * de acuerdo a la categoria que escojio y de inmediato se cargan 
      * los productos encontrados en la misma.
      * */
     public LinkedList<ProductoDTO> listarSubCategorias(int idCategoria) throws MyException, SQLException{
-        LinkedList<ProductoDTO> productos = new LinkedList<>();
+        LinkedList<ProductoDTO> productos = new LinkedList();
         try {
             pstmt = cnn.prepareStatement("SELECT idProductos as id, nombreproducto, categoriasId "
                     + " FROM productos "
@@ -166,17 +167,12 @@ public class CategoriaDAO {
                     ProductoDTO onlyProduct = new ProductoDTO();
                     onlyProduct.setIdProductos(rs.getInt("id"));
                     onlyProduct.setNombre(rs.getString("nombreproducto"));
-                    
-                    //para esta parte creo que ni la categoria se necesita
-                    //onlyProduct.setCategoriaId((CategoriaDTO)rs.getObject("categoriasId"));
-                    onlyProduct.setCategoriaId2(rs.getInt("categoriasId")); //porque 2, porque el otro es de asociacion y este es de int
-                    //onlyProduct.setCategoriaId() probemos primro asi. pero no tiene sentido que coloque un objeto y luefo un atributo
-                    productos.add(onlyProduct);
-                    
+                    onlyProduct.setCategoriaId2(rs.getInt("categoriasId"));
+                    productos.add(onlyProduct);                    
                 }
-            } else {}
+            }
         } catch (SQLException sqle) {
-            throw new MyException("Ha ocurrido lo siguiente. Revise! "+ sqle.getMessage() + sqle.getSQLState());
+            throw new MyException("Ha ocurrido lo siguiente. Revise! "+ sqle.getMessage()+"o mira esto: " + sqle.getSQLState());
         }finally{
             pstmt.close();
         }

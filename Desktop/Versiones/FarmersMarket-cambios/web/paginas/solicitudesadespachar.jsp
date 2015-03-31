@@ -14,22 +14,14 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Farmers Market | Despachos</title>
-        <!-- bootstrap 3.0.2-->
-        <link href="../styles/bootstrap.min.css" rel="stylesheet" type="text/css"/> 
-
-        <link href="../styles/style.css" rel="stylesheet" type="text/css" media="screen" />
-        <!-- font Awesome -->
-        <link href="../styles/font-awesome.min.css" rel="stylesheet" type="text/css"/>
-        <!-- Theme style -->
-        <link href="../styles/AdminLTE.css" rel="stylesheet" type="text/css" />
-
-        <script src="../js/jquery.js"></script>
-        <script src="../js/jquery.validate.js"></script>
-        <script src="../js/additional-methods.js"></script>
-        <!-- Bootstrap -->
-        <script src="../js/bootstrap.min.js" type="text/javascript"></script>
-
+        <link rel="stylesheet" type="text/css" href="../css/bootstrap.css"> 
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
+        <link rel="icon" href="../img/favicon.ico" type="image/x-ico"/>
+        <script src="../js/jquery-1.11.2.min.js"></script>
+        <script src="../js/bootstrap.js"></script>
+        <script type="text/javascript" src="javascript/validacion.js"></script>
+        <SCRIPT language="JavaScript" src="../js/products.js"></SCRIPT>
+        <title>SIGAA | Despachos</title>
         <script>
             function confirmar() {
                 if (confirm('¿Esta seguro de borrar este producto?')) {
@@ -39,110 +31,125 @@
                 }
             }
         </script>
+
+        <%
+            DespachosPedidosDAO despa = new DespachosPedidosDAO();
+            LinkedList<SolicitudDistribuidorDTO> despachos = new LinkedList();
+            despachos = (LinkedList<SolicitudDistribuidorDTO>) despa.mostrarDespachosPendientes();
+        %>
     </head>
     <body>
-        <body>
-        <div id="contenedor">
+        <div class="container">
             <header>
-                <nav>
-                    <ul id="menus">
-                        <li><a href="indexproductor.jsp" class="current">Inicio</a></li>
-                        <li><a href="paginas/listarofertas.jsp">Mis ofertas</a></li>
-                        <li><a href="paginasproductor/listarproductos.jsp">Mis producto</a></li>
-                        <li><a href="paginasproductor/listarsolicitudes.jsp">Mis solicitudes</a></li>
-                        <li><a href="paginasproductor/aplicarsolicitud.jsp">Aplicar a solicitudes</a></li>
-                        <li><a href="paginasproductor/consultar.jsp"> Consultar <img src="images/buscar.png"></a></li>
-                    </ul>
-                </nav>
-
-
-                <hgroup class="intro">
-                    <h1 class="title">Farmert Market</h1>
-                </hgroup>
-
-                <hgroup class="logo">
-                    <img src="images/logoFM.png">
-                </hgroup>       
-
-                <div class="Iniciar">
-                    <a class="btn btn-success" href="paginas/logout.jsp" role="button" >Cerrar sesión</a>
-                </div>
+                <img src="../img/banner.png" alt="" class="col-xs-12">
             </header>
-            </br>
-            </br>
+            <div class="col-xs-12" >
+                <div class="nav"> 						
+                    <ul id="bar"  style="float:right;">
+                        <li><a href="#">Cerrar sesión</a></li>
+                    </ul>
+                </div>	
+            </div>
 
-            <div class="wrapper">
-                <div class="border"></div>
-                <article class="menu">
-                    <div class="border3">
+            <div class="row">
+
+                <center>    
+                    <div class="main" style="width: 96%;" >
+                        <div class="row">
+                            <div class="cuerpo" style="width: 85%; height: 520px; left: 25%;  float: right;">
+
+                                <div class="derecha">
+                                    <center>
+                                        <h1>Solicitudes a despachar</h1>
+                                        <table border="1" id="results" class="table table-bordered" style="width:95%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nombre solicitante</th>             
+                                                    <th>Nombre producto</th>
+                                                    <th>Dirección</th>
+                                                    <th>Teléfono</th>
+                                                    <th>Fecha solicitada</th>
+                                                    <th>Fecha solicitante</th>
+                                                    <th>Despachar</th>
+                                                    <th>Modificar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <%
+                                                    for (SolicitudDistribuidorDTO solDto : despachos) {
+                                                %>
+                                                <tr>
+                                                    <td><%=solDto.getUser().getNombres()%></td>                                    
+                                                    <td><%=solDto.getProduct().getNombre()%></td>
+                                                    <td><%=solDto.getUser().getDireccion()%></td>                                    
+                                                    <td><%=solDto.getUser().getTelefono()%></td>
+                                                    <td><%=solDto.getFechaEntregaInterna()%></td>
+                                                    <td><%=solDto.getFechaSolicitud()%></td>
+                                                    <td><a href="despacharpedido.jsp?idDespacho=<%=solDto.getIdSolicitud()%>"><img src="../imagenes/order.png" width="32" height="32" alt="Despachar pedido de : <%=solDto.getProduct().getNombre()%> " 
+                                                                                                                                   title="Despachar el producto: <%=solDto.getProduct().getNombre()%>">
+                                                        </a></td> 
+                                                    <td><a href="modificardespacho.jsp?idDespacho=<%=solDto.getIdSolicitud()%>"><img src="../imagenes/modificar.png" width="32" height="32" alt="Modificar el despacho de : <%=solDto.getProduct().getNombre()%>" 
+                                                                                                                                     title="Modificar despacho de: <%=solDto.getProduct().getNombre()%>">
+                                                        </a></td> 
+                                                </tr>
+                                                <%
+                                    }%>
+                                            </tbody>
+                                        </table>
+                                        <div style="cursor:pointer;" id="pageNavPosition"></div>
+                                    </center>   
+                                </div>
+
+                            </div>    
+                            <div class="submenu"  style="border: 1px solid #000; width: 15%; height: 520px; right: 20%;float: left; ">
+
+                                <div id="submenu">
+                                    <div class="barraleft" >
+
+                                        <div class="panel-body" id="menuStyle">
+                                            <%
+                                                HttpSession miSesion = request.getSession(false);
+                                                if (miSesion.getAttribute("usr") != null) {
+                                                    UsuariosDTO uregistrado = (UsuariosDTO) miSesion.getAttribute("usr");
+                                                    String menu = (String) miSesion.getAttribute("mp");
+
+                                                    out.print("Usuario : " + uregistrado.getNombres());
+                                                    out.println(menu);
+
+                                                } else {
+                                                    response.sendRedirect("../index.jsp");
+                                                }
+                                                //class="text-left"
+                                            %>
+
+
+                                        </div>   
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
-                    <h2>A despachar!!</h2>
-                    <div class="left">
-                        <%
-                            HttpSession misesion = request.getSession(false);
+                </center>
+            </div>	 			
+            <footer class="cnt"> Pie de Pagina </footer> 
+        </div>  
+        <script type="text/javascript">
+            <!--
+                    var pager = new Pager('results', 6);
+            pager.init();
+            pager.showPageNav('pager', 'pageNavPosition');
+            pager.showPage(1);
+            //--></script>
+        <div class="style">
+            <%
+                if (request.getParameter("msg") != null) {
+                    out.print(request.getParameter("msg"));
+                }
+            %>
 
-                            if (misesion.getAttribute("usuarioLogueado") == null) {
-                                response.sendRedirect("login.jsp?msg= Usuario desconocido");
-
-                            } else {
-                                UsuariosDTO userLogueado = new UsuariosDTO();
-                                userLogueado = (UsuariosDTO) misesion.getAttribute("usuarioLogueado");
-                        %>
-
-                        <%
-                            DespachosPedidosDAO despa= new DespachosPedidosDAO();
-                            LinkedList<SolicitudDistribuidorDTO> despachos = new LinkedList();
-                            despachos = (LinkedList<SolicitudDistribuidorDTO>) despa.mostrarDespachosPendientes();
-                        %>
-
-                        <table class="table table-striped" style="width:80%" name="table1" border="1" id="results">
-                            <thead>
-                                <tr>
-                                    <th>Nombre solicitante</th>             
-                                    <th>Nombre producto</th>
-                                    <th>Dirección</th>
-                                    <th>Teléfono</th>
-                                    <th>Fecha solicitada</th>
-                                    <th>Fecha solicitante</th>
-                                    <th>Despachar</th>
-                                    <th>Modificar</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <%
-                                    for (SolicitudDistribuidorDTO solDto : despachos) {
-                                %>
-                                <tr>
-                                    <td><%=solDto.getUser().getNombres()%></td>                                    
-                                    <td><%=solDto.getProduct().getNombre()%></td>
-                                    <td><%=solDto.getUser().getDireccion() %></td>                                    
-                                    <td><%=solDto.getUser().getTelefono()%></td>
-                                    <td><%=solDto.getFechaEntregaInterna()%></td>
-                                    <td><%=solDto.getFechaSolicitud()%></td>
-                                    <td><a href="despacharpedido.jsp?idDespacho=<%=solDto.getIdSolicitud()%>"><img src="../imagenes/order.png" width="32" height="32" alt="Despachar pedido de : <%=solDto.getProduct().getNombre()%> " 
-                                                                                                            title="Despachar el producto: <%=solDto.getProduct().getNombre()%>">
-                                        </a></td> 
-                                    <td><a href="modificardespacho.jsp?idDespacho=<%=solDto.getIdSolicitud()%>"><img src="../imagenes/modificar.png" width="32" height="32" alt="Modificar el despacho de : <%=solDto.getProduct().getNombre()%>" 
-                                                                                                       title="Modificar despacho de: <%=solDto.getProduct().getNombre()%>">
-                                        </a></td> 
-
-                                    
-                                </tr>
-                                <%
-                                }%>
-                            </tbody>
-                        </table>                      
-                            <div id="pageNavPosition"></div>
-                            <%
-                                if (request.getParameter("msg") != null) {
-
-                            %>
-                        <div class="confirmarOK"><%=request.getParameter("msg")%></div>        
-
-                        <%
-                                }
-                            }
-                        %>
-        </body>
+        </div>
     </body>
 </html>

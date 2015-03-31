@@ -5,12 +5,15 @@
  */
 package controlador;
 
+import daos.MyException;
 import daos.UsuariosDAO;
 import dtos.UsuariosDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -33,51 +36,38 @@ public class ControladorUsuarios extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, MyException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        try {
-
-            if (request.getParameter("btnIngresar") != null && request.getParameter("ingresar") != null) {
+        try {     
+            if (request.getParameter("btnModificarUsuario") != null && request.getParameter("modificarUsuario") != null) {
                 out.print("ok");
-                String correo = request.getParameter("txtCorreo");
-                String psw = request.getParameter("txtClave");
-                UsuariosDAO menu = new UsuariosDAO();
-                UsuariosDTO datosUsuario = new UsuariosDTO();
-                String menuAPintar = "";
-                HashMap<UsuariosDTO, String> hs = new HashMap<UsuariosDTO, String>();
-                hs = menu.validarUsuarioV2(correo, psw);
-                for (Map.Entry<UsuariosDTO, String> registro : hs.entrySet()) {
-                    datosUsuario = registro.getKey();
-                    menuAPintar = registro.getValue();
-                }
-
-               // out.print("documento " + datosUsuario.getDocumento());
-                if (datosUsuario.getCedula() != 0) {
-                    HttpSession miSesion = request.getSession(true);
-                    miSesion.setAttribute("usr", datosUsuario);
-                    miSesion.setAttribute("mp", menuAPintar);
-                    response.sendRedirect("../paginasProductor/index.jsp");
-
-                } else {
-                    response.sendRedirect("index.jsp?msg=no existe");
-                }
-            } else {
-
-                /*
-                 * TODO output your page here. You may use following sample
-                 * code.
-                 */
-                out.println("<html>");
-                out.println("<head>");
-                out.println("<title>Servlet Controlador</title>");
-                out.println("</head>");
-                out.println("<body>");
-                out.println("<h1>Servlet Controlador at " + request.getContextPath() + "</h1>");
-                out.println("<h1> acceso invalido</h1>");
-                out.println("</body>");
-                out.println("</html>");
+                UsuariosDTO user = new UsuariosDTO();
+                user.setIdUsuarios(Integer.parseInt(request.getParameter("txtId").trim()));
+                user.setTelefono(Integer.parseInt(request.getParameter("txtTelefono").trim()));
+                user.setDireccion(request.getParameter("txtDireccion").trim());
+                user.setCorreo(request.getParameter("txtCorreo").trim());
+                user.setCiudad(request.getParameter("txtCiudad").trim());
+                UsuariosDAO userDao = new UsuariosDAO();
+                String salida = userDao.modificarUsuario(user);
+                response.sendRedirect("paginas/perfil.jsp?=msg "+salida);
+            }else{
+                out.println("Su ingreso no es permitido");
             }
+            /*
+             * TODO output your page here. You may use following sample
+             * code.
+             */
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet Controlador</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet Controlador at " + request.getContextPath() + "</h1>");
+            out.println("<h1> acceso invalido</h1>");
+            out.println("</body>");
+            out.println("</html>");
+
         } finally {
             out.close();
         }
@@ -95,7 +85,11 @@ public class ControladorUsuarios extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (MyException ex) {
+            Logger.getLogger(ControladorUsuarios.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -109,7 +103,11 @@ public class ControladorUsuarios extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (MyException ex) {
+            Logger.getLogger(ControladorUsuarios.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

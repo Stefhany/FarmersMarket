@@ -18,7 +18,6 @@
         <%  
             CategoriaDAO cdao = new CategoriaDAO();
             LinkedList<ProductoDTO> listaproductos = new LinkedList<ProductoDTO>();
-
             if (request.getParameter("id") != null) {
 
                 listaproductos = cdao.listarSubCategorias(Integer.parseInt(request.getParameter("id")));

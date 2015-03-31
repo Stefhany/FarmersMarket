@@ -14,26 +14,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import utilidades.Conectar;
+import Conexion.Conection;
 
 /**
  *
  * @author Mona
  */
 public class AportesProductoresDAO {
-    PreparedStatement pstmt = null;
-    CallableStatement cllstmt = null;
-    Connection cnn = null;
-    ResultSet rs = null;
-    int resultado = 0;
-    String salida = "";
-
-    public AportesProductoresDAO() {
-        cnn = Conectar.getInstance();
-    }
+    private PreparedStatement pstmt = null;
+    private CallableStatement cllstmt = null;
+    private Connection cnn = null;
+    private ResultSet rs = null;
     
-    public LinkedList<SolicitudDistribuidorDTO> listarSolicitudesDeAsociacion() {
+    public LinkedList<SolicitudDistribuidorDTO> listarSolicitudesDeAsociacion(Connection cnn) {
         LinkedList<SolicitudDistribuidorDTO> solicitudes = new LinkedList();
+        this.cnn = cnn;
+        String salida = "";
         try {
             String querrySolicitudesDistribuidor = " select idSolicitudDistribuidor, idUsuarios, "
                     + " concat(nombres,' ',apellidos) as Distribuidor, idProductos, "
@@ -64,8 +60,10 @@ public class AportesProductoresDAO {
         return solicitudes;
     }
     
-    public SolicitudDistribuidorDTO byIdForAssociation(int id) {
+    public SolicitudDistribuidorDTO byIdForAssociation(int id, Connection cnn) {
         SolicitudDistribuidorDTO solicitud = null;
+        this.cnn = cnn;
+        String salida = "";
         try {
             String querrySolicitudesDistribuidor = " SELECT idSolicitudDistribuidor, idUsuarios,"
                     + " concat(nombres, ' ', apellidos) AS Distribuidor, idProductos, nombreProducto,"
@@ -99,10 +97,10 @@ public class AportesProductoresDAO {
     
     
     public String aplicarSolicitudAsociacion(String fechaEntrega, int cantidadAportar, int proAsoId, 
-            int idSolicitud){
-        
+            int idSolicitud, Connection cnn){
+        this.cnn = cnn;
         int sal = 0;
-        String mensaje = " ";
+        String mensaje = "";
         try {
             String procedureOrder = "{call ps_aplicarSolicitudV5(?,?,?,?,?)}";
             
