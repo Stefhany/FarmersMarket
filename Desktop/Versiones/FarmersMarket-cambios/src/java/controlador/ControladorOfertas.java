@@ -5,9 +5,8 @@
  */
 package controlador;
 
-import daos.OfertasDAO;
-import daos.ProductosAsociadosUsuariosDAO;
 import dtos.OfertasDTO;
+import facade.FacadeOfertas;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -34,45 +33,41 @@ public class ControladorOfertas extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        FacadeOfertas facadeOffer = new FacadeOfertas();
+        OfertasDTO ofDto = new OfertasDTO();
+        String salida = "";
         try {
             /* TODO output your page here. You may use following sample code. */
             if (request.getParameter("btnModificarOferta") != null && request.getParameter("modificarOferta") != null) {
-                OfertasDTO ofDto = new OfertasDTO();
+                
                 ofDto.setIdOfertas(Integer.parseInt(request.getParameter("txtIdOferta").trim()));
                 ofDto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
-                OfertasDAO ofDao = new OfertasDAO();
-                String salida = ofDao.modificarOferta(ofDto);
-                response.sendRedirect("paginas/listarofertas.jsp?msg= "+salida);                
+                
+                salida = facadeOffer.actualizarOferta(ofDto);
+                response.sendRedirect("paginas/ofertas/listarofertas.jsp?msgSalida= "+salida);       
+                
             }else if (request.getParameter("btnModificarMiOferta") != null && request.getParameter("modificarMiOferta") != null) {
-                OfertasDTO ofDto = new OfertasDTO();
+                
                 ofDto.setIdOfertas(Integer.parseInt(request.getParameter("txtIdOferta").trim()));
                 ofDto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
-                ProductosAsociadosUsuariosDAO proDao = new ProductosAsociadosUsuariosDAO();
-                String salida = proDao.modificarMyOffer(ofDto);
-                response.sendRedirect("paginas/misofertas.jsp?msg= "+salida);
+                
+                salida = facadeOffer.actualizarMiOferta(ofDto);
+                response.sendRedirect("paginas/ofertas/misofertas.jsp?msgSalida= "+salida);
+                
             }else if (request.getParameter("btnRegistrarOferta") != null && request.getParameter("registrarOferta") != null) {
-                OfertasDTO ofdto = new OfertasDTO();
-                OfertasDAO ofdao = new OfertasDAO();
-                ofdto.setProductosAsociadosUsuariosId(Integer.parseInt(request.getParameter("txtProductoAsociado").trim()));
-                ofdto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
-                ofdto.setPrecio(Float.parseFloat(request.getParameter("txtPrecio").trim()));
-                String salida = ofdao.insertarOferta(ofdto);
-                response.sendRedirect("paginas/perfil.jsp?msg= " + salida);
+                
+                ofDto.setProductosAsociadosUsuariosId(Integer.parseInt(request.getParameter("txtProductoAsociado").trim()));
+                ofDto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
+                ofDto.setPrecio(Float.parseFloat(request.getParameter("txtPrecio").trim()));
+                
+                salida = facadeOffer.registrarOferta(ofDto);
+                response.sendRedirect("paginas/usuarios/perfil.jsp?msgSalida= " + salida);
 
             }           
             
             else {
                 out.print("Esta ingresando de forma fraudalenta!!");
             }
-//            out.println("<!DOCTYPE html>");
-//            out.println("<html>");
-//            out.println("<head>");
-//            out.println("<title>Servlet ControladorOfertas</title>");            
-//            out.println("</head>");
-//            out.println("<body>");
-//            out.println("<h1>Servlet ControladorOfertas at " + request.getContextPath() + "</h1>");
-//            out.println("</body>");
-//            out.println("</html>");
             
         }finally {
             out.printf(" ");

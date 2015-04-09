@@ -29,7 +29,6 @@ public class AportesProductoresDAO {
     public LinkedList<SolicitudDistribuidorDTO> listarSolicitudesDeAsociacion(Connection cnn) {
         LinkedList<SolicitudDistribuidorDTO> solicitudes = new LinkedList();
         this.cnn = cnn;
-        String salida = "";
         try {
             String querrySolicitudesDistribuidor = " select idSolicitudDistribuidor, idUsuarios, "
                     + " concat(nombres,' ',apellidos) as Distribuidor, idProductos, "
@@ -53,9 +52,11 @@ public class AportesProductoresDAO {
                     solicitud.setFechaEntregaInterna(rs.getString("fechaEntregaInterna"));
                     solicitudes.add(solicitud);
                 }
+            }else{
+                System.out.println("No se encontraron registros...");
             }
         } catch (SQLException sqle) {
-            salida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
+            System.out.println("Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState());
         }
         return solicitudes;
     }
@@ -63,7 +64,6 @@ public class AportesProductoresDAO {
     public SolicitudDistribuidorDTO byIdForAssociation(int id, Connection cnn) {
         SolicitudDistribuidorDTO solicitud = null;
         this.cnn = cnn;
-        String salida = "";
         try {
             String querrySolicitudesDistribuidor = " SELECT idSolicitudDistribuidor, idUsuarios,"
                     + " concat(nombres, ' ', apellidos) AS Distribuidor, idProductos, nombreProducto,"
@@ -87,10 +87,12 @@ public class AportesProductoresDAO {
                     solicitud.setCantidadSolicitada(rs.getInt("cantidadSolicitada"));
                     solicitud.setFechaEntregaInterna(rs.getString("fechaEntregaInterna"));
                 }
+            }else{
+                System.out.println("No se encontraron registros...");
             }
 
         } catch (SQLException sqle) {
-            salida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
+            System.out.println("Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState());
         }
         return solicitud;
     }
@@ -100,10 +102,9 @@ public class AportesProductoresDAO {
             int idSolicitud, Connection cnn){
         this.cnn = cnn;
         int sal = 0;
-        String mensaje = "";
+        String msgSalida = "";
         try {
             String procedureOrder = "{call ps_aplicarSolicitudV5(?,?,?,?,?)}";
-            
             cllstmt = cnn.prepareCall(procedureOrder);
             cllstmt.setString(1, fechaEntrega);
             cllstmt.setInt(2, cantidadAportar);
@@ -114,17 +115,17 @@ public class AportesProductoresDAO {
             sal = cllstmt.getInt(5);
             
             if (sal == 1) {
-                mensaje = "Bien. Revisa la base de datos. Ocurrio el primer procedimiento";
+                msgSalida = "Bien. Revisa la base de datos. Ocurrio el primer procedimiento";
             } else if (sal == 2) {
-                mensaje = "Bien. Ocurrio el segundo procedimiento";
+                msgSalida = "Bien. Ocurrio el segundo procedimiento";
             } else if (sal == -1) {
-                mensaje = "No ha tenido modificación la base de datos";
+                msgSalida = "No ha tenido modificación la base de datos";
             } else {
-                mensaje = "something was wrong!!!";
+                msgSalida = "something was wrong!!!";
             }
         }catch(SQLException sqle){
-            mensaje = "Pilas! Ocurrio la siguiente excepción " + sqle.getMessage();
+            msgSalida = "Pilas! Ocurrio la siguiente excepción " + sqle.getMessage();
         }
-        return mensaje;
+        return msgSalida;
     }
 }

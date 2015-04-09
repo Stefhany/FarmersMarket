@@ -4,6 +4,8 @@
     Author     : Mona
 --%>
 
+<%@page import="facade.FacadeConsultas"%>
+<%@page import="facade.FacadeProductosAsociadosUsuarios"%>
 <%@page import="daos.Consultas"%>
 <%@page import="dtos.UsuariosDTO"%>
 <%@page import="dtos.ProductosAsociadosUsuariosDTO"%>
@@ -44,10 +46,12 @@
 
                 //int idUsuario = userdto.getIdUsuarios();
                 //int id = Integer.parseInt(request.getParameter("idProductor"));
-                ProductosAsociadosUsuariosDAO padao = new ProductosAsociadosUsuariosDAO();
+                FacadeProductosAsociadosUsuarios facadeProAso = new FacadeProductosAsociadosUsuarios();
+                
                 ArrayList<ProductosAsociadosUsuariosDTO> productos = new ArrayList();
                 //productos = padao.listarProductosByUser(3);
-                productos = padao.listarProductosByUser(userdto.getIdUsuarios());
+                productos = facadeProAso.listarProductosByUser(userdto.getIdUsuarios());
+                        
                 if (productos != null) {
         %>
     </head>
@@ -57,7 +61,10 @@
                 <img src="../../img/banner.png" alt="" class="col-xs-12">
             </header>
             <div class="col-xs-12" >
-                <div class="nav"> 						
+                <div class="nav"> 	
+                    <ul id="bar"  style="float:left;">
+                        <li><a href="../usuarios/perfil.jsp">Inicio</a></li>
+                    </ul>
                     <ul id="bar"  style="float:right;">
                         <li><a href="logout.jsp">Cerrar sesión</a></li>
                     </ul>
@@ -101,7 +108,7 @@
                                                 </tr>
                                                 <%
                                                         }
-                                                    }
+                                                    }else{}
                                                 %>
                                             </tbody>
                                         </table>
@@ -139,8 +146,11 @@
                         <li><a id="sena" href="http://www.sena.edu.co/">Sena</a></li>
                         <li>Stefhany Alfonso Rincón</li>
                             <li>Última actualización: 
-                            <%Consultas c = new Consultas();
-                            out.println(c.consultarFecha());%></li>
+                            <%
+                                FacadeConsultas facadeConsults = new FacadeConsultas();
+                                out.println(facadeConsults.consultarFecha());
+                            %>                            
+                            </li>
                         <li><a href="http://www.minagricultura.gov.co/">MinAgricultura</a></li>
                     </ul>
                 </nav>

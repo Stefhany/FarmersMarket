@@ -5,10 +5,10 @@
  */
 package controlador;
 
-import daos.ProductoDAO;
-import daos.ProductosAsociadosUsuariosDAO;
 import dtos.CategoriaDTO;
 import dtos.ProductoDTO;
+import facade.FacadeProductos;
+import facade.FacadeProductosAsociadosUsuarios;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -35,37 +35,32 @@ public class ControladorProductos extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        ProductoDTO pdto = new ProductoDTO();
+        FacadeProductosAsociadosUsuarios facadeProAsoUser = new FacadeProductosAsociadosUsuarios();
+        FacadeProductos facadeProducts = new FacadeProductos();
+        String salida = "";
         try  {
             if (request.getParameter("btnRegistrarProAso")!=null && request.getParameter("registrarProAso") != null)  {
-                ProductosAsociadosUsuariosDAO nuevoProAso = new ProductosAsociadosUsuariosDAO();
-                String salida = nuevoProAso.insertarProductoAsociado(request.getParameter("txtNombre").trim(), 
+                
+                salida = facadeProAsoUser.insertarProductoAsociado(request.getParameter("txtNombre").trim(), 
                         Integer.parseInt(request.getParameter("txtCategoria").trim()), 
                         Integer.parseInt(request.getParameter("txtIdUsu").trim()));
-                response.sendRedirect("paginas/misproductos.jsp?msg= "+salida);
+                
+                response.sendRedirect("paginas/productos/misproductos.jsp?msgSalida= "+salida);
                 
             }else if (request.getParameter("btnRegistrar") != null && request.getParameter("registrar") != null) {
-                ProductoDTO pdto = new ProductoDTO();
-                ProductoDAO pdao = new ProductoDAO();
+                
                 CategoriaDTO cdto = new CategoriaDTO();
                 pdto.setNombre(request.getParameter("txtNombre").trim());
                 pdto.setUnidad(request.getParameter("txtUnidad").trim());
                 cdto.setIdCategoria(Integer.parseInt(request.getParameter("txtCategoria").trim()));
                 pdto.setCategoriaId(cdto);
-                String salida = pdao.insertarProducto(pdto);
-                response.sendRedirect("paginas/productos/perfil.jsp?msg= " + salida);                
+                
+                salida = facadeProducts.registrarProducto(pdto);
+                response.sendRedirect("paginas/productos/perfil.jsp?msgSalida= " + salida);                
             }else {
                 out.print("Esta ingresando de forma fraudalenta. ");
             }
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ControladorProductos</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ControladorProductos at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
         }finally  {
             out.close();
         }

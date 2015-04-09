@@ -4,10 +4,9 @@
  * and open the template in the editor.
  */
 package Conexion;
-
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
-
 import java.sql.SQLException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -35,34 +34,54 @@ public class Conection extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        
-        }
-    
-    public static Connection getConection(){
-        Context ctx = null;
-        DataSource ds = null;
-        Connection cnn = null;
-        
-        try {
-            ctx = new InitialContext();
-            ds = (DataSource) ctx.lookup("jdbc/fm");
-            cnn = ds.getConnection();
-        }catch(NamingException na){
-            System.out.println("Ha ocurrido lo siguiente "+na.getMessage()+" de la excepción NamingException.");
-        }catch(SQLException sqle){
-            System.out.println("Ha ocurrido lo siguiente: "+sqle.getMessage()+" de la excepción SQLException. ");
-        }
-        
-        if (cnn != null) {
-            return cnn;
-        }else{
-            return null;
-        }
-        
+        response.setContentType("text/html;charset=UTF-8");   
+        PrintWriter out = response.getWriter();
+        out.println("<h1>Resultado de la conexión " + getConnection2() + "</h1>");
     }
     
-
+//    public static Connection getConection(){
+//        Context ctx = null;
+//        DataSource ds = null;
+//        Connection cnn = null;
+//        
+//        try {
+//            ctx = new InitialContext();
+//            ds = (DataSource) ctx.lookup("jdbc/fm");
+//            cnn = ds.getConnection();
+//        }catch(NamingException na){
+//            System.out.println("Ha ocurrido lo siguiente "+na.getMessage()+" de la excepción NamingException.");
+//        }catch(SQLException sqle){
+//            System.out.println("Ha ocurrido lo siguiente: "+sqle.getMessage()+" de la excepción SQLException. ");
+//        }
+//        
+//        if (cnn != null) {
+//            return cnn;           
+//        }else{
+//            return null;
+//        }        
+//    }
+    
+    public static Connection getConnection2() {
+        
+        Connection cnn = null;
+        Context ctx;
+        try {
+            ctx = new InitialContext();
+            DataSource ds = (DataSource) ctx.lookup("jdbc/fm");
+            cnn = ds.getConnection();
+            if (cnn != null) {
+                
+                return cnn;
+            } else {
+                return null;
+            }
+        } catch (NamingException ex) {
+            System.out.println("Mire: "+ex.getMessage());
+        } catch (SQLException sqle) {
+            System.out.println("Lo siento= "+ sqle.getMessage());
+        }
+        return cnn;
+    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -101,5 +120,4 @@ public class Conection extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

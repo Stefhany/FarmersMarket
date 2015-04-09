@@ -34,9 +34,9 @@ public class CategoriaDAO {
         pstmt.setString(1, p.getNombre());
         rtdo = pstmt.executeUpdate();
         if (rtdo > 0) {
-            msgSalida = "se modificaron (" + rtdo + ") registros";
+            msgSalida = "Se logro insertar el registro (" + rtdo + ")";
         } else {
-            msgSalida = "NO se pudo actualizar el registro";
+            msgSalida = "No se pudo ingresar el registro";
         }
         return msgSalida;
     }
@@ -96,6 +96,8 @@ public class CategoriaDAO {
             
             if (rto != 0) {
                 msgSalida = "Registro " + rto + " eliminado. Exitosamente";
+            }else{
+                msgSalida = "No se pudo realizar la eliminación";
             }
         }catch (SQLException sqle){
             msgSalida = "Ocurrio esta excepción "+sqle.getMessage();
@@ -134,13 +136,17 @@ public class CategoriaDAO {
                     + " FROM categorias ";
             pstmt = cnn.prepareStatement(query);
             rs = pstmt.executeQuery();
-
-            while (rs.next()) {
+            if (rs != null) {
+                while (rs.next()) {
                 CategoriaDTO newCategory = new CategoriaDTO();
                 newCategory.setIdCategoria(rs.getInt("id"));
                 newCategory.setNombre(rs.getString("nombreCategoria"));                
                 listaCategory.add(newCategory);
             }
+            }else{
+                throw new MyException("No se encuentran registros...");
+            }
+            
         } catch (SQLException ex) {
             throw new MyException("Error al listar los elementos " + ex.getSQLState() + " - " + ex.getMessage());
         } finally {
@@ -154,7 +160,8 @@ public class CategoriaDAO {
      * de acuerdo a la categoria que escojio y de inmediato se cargan 
      * los productos encontrados en la misma.
      * */
-    public LinkedList<ProductoDTO> listarSubCategorias(int idCategoria) throws MyException, SQLException{
+    public LinkedList<ProductoDTO> listarSubCategorias(int idCategoria, Connection cnn) throws MyException, SQLException{
+        this.cnn = cnn;
         LinkedList<ProductoDTO> productos = new LinkedList();
         try {
             pstmt = cnn.prepareStatement("SELECT idProductos as id, nombreproducto, categoriasId "

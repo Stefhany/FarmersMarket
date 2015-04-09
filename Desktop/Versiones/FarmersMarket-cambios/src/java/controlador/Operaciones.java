@@ -6,6 +6,8 @@
 package controlador;
 
 import daos.ProductosAsociadosUsuariosDAO;
+import facade.FacadePedidoSobreOferta;
+import facade.FacadeProductosAsociadosUsuarios;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -32,26 +34,20 @@ public class Operaciones extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        try  {
+        FacadeProductosAsociadosUsuarios facadeProAsoUser = new FacadeProductosAsociadosUsuarios();
+        String salida = "";
+        try {
             /* TODO output your page here. You may use following sample code. */
             if (request.getParameter("idProAso") != null) {
-                ProductosAsociadosUsuariosDAO pro = new ProductosAsociadosUsuariosDAO();
-                String msj = " ";
-                msj = pro.eliminarProAso(Integer.parseInt(request.getParameter("idProAso")));
-                response.sendRedirect("paginas/misproductos.jsp?msg= "+msj);
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet Operaciones</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet Operaciones at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }finally {
+
+                salida = facadeProAsoUser.eliminarProAso(Integer.parseInt(request.getParameter("idProAso")));
+
+                response.sendRedirect("paginas/productos/misproductos.jsp?msgSalida= " + salida);
+            }
+        } finally {
             out.close();
-        }}
+        }
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

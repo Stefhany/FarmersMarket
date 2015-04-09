@@ -5,15 +5,12 @@
  */
 package controlador;
 
-import daos.MyException;
-import daos.OfertasDAO;
-import modelo.dao.PedidosDAO;
-import daos.ProductoDAO;
-import daos.UsuariosDAO;
-import dtos.CategoriaDTO;
 import dtos.OfertasDTO;
 import dtos.ProductoDTO;
 import dtos.UsuariosDTO;
+import facade.FacadeOfertas;
+import facade.FacadeProductos;
+import facade.FacadeUsuarios;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
@@ -25,6 +22,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import utilidades.MyException;
 
 /**
  *
@@ -49,26 +47,27 @@ public class Controlador extends HttpServlet {
         PrintWriter out = response.getWriter();
         String salida = " ";
         try {
-            if (request.getParameter("btnRegistrarOferta") != null && request.getParameter("registrarOferta") != null) {
-                OfertasDTO ofdto = new OfertasDTO();
-                OfertasDAO ofdao = new OfertasDAO();
-                ofdto.setProductosAsociadosUsuariosId(Integer.parseInt(request.getParameter("txtProductoAsociado").trim()));
-                
-                ofdto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
-                ofdto.setPrecio(Float.parseFloat(request.getParameter("txtPrecio").trim()));
-                
-                salida = ofdao.insertarOferta(ofdto);
-                response.sendRedirect("paginas/perfil.jsp?msg= " + salida);
-
-            } else if (request.getParameter("btnActualizarProducto") != null && request.getParameter("actualizarProducto") != null) {
+//            if (request.getParameter("btnRegistrarOferta") != null && request.getParameter("registrarOferta") != null) {
+//                OfertasDTO ofdto = new OfertasDTO();
+//                ofdto.setProductosAsociadosUsuariosId(Integer.parseInt(request.getParameter("txtProductoAsociado").trim()));
+//                ofdto.setCantidad(Integer.parseInt(request.getParameter("txtCantidad").trim()));
+//                ofdto.setPrecio(Float.parseFloat(request.getParameter("txtPrecio").trim()));
+//                
+//                FacadeOfertas facadeOffer = new FacadeOfertas();
+//                salida = facadeOffer.registrarOferta(ofdto);
+//                response.sendRedirect("paginas/perfil.jsp?msgSalida= " + salida);
+//
+//            } else
+            if (request.getParameter("btnActualizarProducto") != null && request.getParameter("actualizarProducto") != null) {
                 ProductoDTO prdto = new ProductoDTO();
                 prdto.setNombre(request.getParameter("txtNombre").trim());
                 prdto.setUnidad(request.getParameter("txtUnidad").trim());
                 prdto.setCategoriaId2(Integer.parseInt(request.getParameter("txtCategoria").trim()));
-                ProductoDAO prdao = new ProductoDAO();
-                salida = prdao.modificarProducto(prdto);
-                //out.print(salida);
-                response.sendRedirect("paginas/perfil.jsp?msg=" + salida);
+                
+                FacadeProductos facadeProducto = new FacadeProductos();
+                salida = facadeProducto.actualizarProducto(prdto);
+                response.sendRedirect("paginas/usuarios/perfil.jsp?msgSalida=" + salida);
+                
 //            } else if (request.getParameter("btnIngresarSistema") != null && request.getParameter("ingresarSistema") != null) {
 //                UsuariosDAO udao = new UsuariosDAO();
 //                UsuariosDTO udto = new UsuariosDTO();
@@ -93,37 +92,27 @@ public class Controlador extends HttpServlet {
                 udto.setNotificacion(Boolean.parseBoolean(request.getParameter("txtnotificacion")));
                 udto.setCiudad(request.getParameter("txtciudad").trim());
                 udto.setFechaNacimiento(sdf.format(Date.valueOf(request.getParameter("txtfechanacimiento"))).toString());
-//    p       m     out.println(udto.getNombres());
-//    r       e     out.println(udto.getApellidos());
-//    o   e   t      out.println(udto.getCedula());
-//    b   l   o      out.println(udto.getTelefono());
-//    a       d     out.println(udto.getDireccion());
-//    n       o     out.println(udto.getCorreo());
-//    d            out.println(udto.getClave());
-//    o            out.println(udto.isNotificacion());
-//                out.println(udto.getCiudad());
-//                out.println(udto.getFechaNacimiento());
-                UsuariosDAO dao = new UsuariosDAO();
-                salida = dao.ingresarRegistro(udto);
-                response.sendRedirect("login.jsp?msg=" + salida);
+
+                FacadeUsuarios facadeUser = new FacadeUsuarios();
+                salida = facadeUser.ingresarRegistro(udto);
+                response.sendRedirect("login.jsp?msgSalida=" + salida);
 
             } else if (request.getParameter("idUsuario") != null) {
-                UsuariosDAO userdao = new UsuariosDAO();
-                String sal = ""; 
-                sal = userdao.eliminarUsuario(Integer.parseInt(request.getParameter("idUsuario")));
-                response.sendRedirect("paginas/tablagestionarrol.jsp?msg= "+sal);
+                
+                FacadeUsuarios facadeUser = new FacadeUsuarios();
+                salida = facadeUser.eliminarUsuario(Integer.parseInt(request.getParameter("idUsuario")));
+                response.sendRedirect("paginas/usuarios/tablagestionarrol.jsp?msgSalida= "+salida);
 
             }  else if (request.getParameter("idProducto") != null) {
-                ProductoDAO pro = new ProductoDAO();
-                String sal = ""; 
-                sal = pro.eliminarProducto(Integer.parseInt(request.getParameter("idProducto")));
-                response.sendRedirect("paginas/listarproductos.jsp?msg= "+sal);
+                
+                FacadeProductos facadeProducto = new FacadeProductos();
+                salida = facadeProducto.eliminarProducto(Integer.parseInt(request.getParameter("idProducto")));
+                response.sendRedirect("paginas/productos/listarproductos.jsp?msgSalida= "+salida);
                 
             } else if (request.getParameter("idOfertas") != null) {
-                OfertasDAO ofdao = new OfertasDAO();
-                String msj = " ";
-                msj = ofdao.eliminarOferta(Integer.parseInt(request.getParameter("idOfertas")));
-                response.sendRedirect("paginas/listarofertas.jsp?msg= "+msj);
+                FacadeOfertas facadeOffer = new FacadeOfertas();
+                salida = facadeOffer.eliminarOferta(Integer.parseInt(request.getParameter("idOfertas")));
+                response.sendRedirect("paginas/ofertas/listarofertas.jsp?msgSalida= "+salida);
                 
             } else {
                 out.println("Esta ingresando de forma fraudalenta");

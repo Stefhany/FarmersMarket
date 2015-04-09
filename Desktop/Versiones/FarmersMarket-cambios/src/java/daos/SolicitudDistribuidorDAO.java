@@ -25,13 +25,9 @@ public class SolicitudDistribuidorDAO {
     Connection cnn = null;
     ResultSet rs = null;
     int resultado = 0;
-    String salida = "";
+    String msgSalida = "";
 
-    public SolicitudDistribuidorDAO() {
-        cnn = Conectar.getInstance();
-    }
-
-    public String insertarSolicitudDistribuidor(SolicitudDistribuidorDTO solicitud) {
+    public String insertarSolicitudDistribuidor(SolicitudDistribuidorDTO solicitud, Connection cnn) {
         try {
             pstmt = cnn.prepareStatement("INSERT INTO solicituddistribuidor VALUES (null,?,current_date(),?,null,3,?,?);");
             pstmt.setInt(1, solicitud.getCantidadSolicitada());
@@ -41,17 +37,17 @@ public class SolicitudDistribuidorDAO {
             pstmt.setInt(4, solicitud.getDistribuidorId());
             resultado = pstmt.executeUpdate();
             if (resultado != 0) {
-                salida = "El registro de la solicitud " + resultado + " ha sido exitoso";
+                msgSalida = "El registro de la solicitud " + resultado + " ha sido exitoso";
             } else {
-                salida = "No se pudo realizar el registro";
+                msgSalida = "No se pudo realizar el registro";
             }
         } catch (SQLException sqle) {
-            salida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
+            msgSalida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
         }
-        return salida;
+        return msgSalida;
     }
 
-    public LinkedList<SolicitudDistribuidorDTO> listarSolicitudesDistribuidor() {
+    public LinkedList<SolicitudDistribuidorDTO> listarSolicitudesDistribuidor(Connection cnn) {
         LinkedList<SolicitudDistribuidorDTO> solicitudes = new LinkedList();
         try {
             String querrySolicitudesDistribuidor = " select idSolicitudDistribuidor, idUsuarios, "
@@ -76,12 +72,12 @@ public class SolicitudDistribuidorDAO {
                 }
             }
         } catch (SQLException sqle) {
-            salida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
+            msgSalida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
         }
         return solicitudes;
     }
 
-    public SolicitudDistribuidorDTO byIdRequest(int id) {
+    public SolicitudDistribuidorDTO byIdRequest(int id, Connection cnn) {
         SolicitudDistribuidorDTO solicitud = null;
         try {
             String querrySolicitudesDistribuidor = " SELECT idSolicitudDistribuidor, idUsuarios,"
@@ -105,27 +101,27 @@ public class SolicitudDistribuidorDAO {
             }
 
         } catch (SQLException sqle) {
-            salida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
+            msgSalida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
         }
         return solicitud;
     }
 
-    public String eliminarSolicitud(int id) {
+    public String eliminarSolicitud(int id, Connection cnn) {
         try {
             pstmt = cnn.prepareStatement("DELETE FROM solicituddistribuidor WHERE idSolicitudDistribuidor = ?;");
             pstmt.setInt(1, id);
             resultado = pstmt.executeUpdate();
 
             if (resultado != 0) {
-                salida = "Registro " + resultado + " eliminado. Exitosamente";
+                msgSalida = "Registro " + resultado + " eliminado. Exitosamente";
             }
         } catch (SQLException sqle) {
-            salida = "Ocurrio esta excepción " + sqle.getMessage();
+            msgSalida = "Ocurrio esta excepción " + sqle.getMessage();
         }
-        return salida;
+        return msgSalida;
     }
 
-    public String modificarSolicitudDistribuidor(SolicitudDistribuidorDTO solicitud) {
+    public String modificarSolicitudDistribuidor(SolicitudDistribuidorDTO solicitud, Connection cnn) {
         try {
             String querryUpdateSolicitud = "UPDATE `solicituddistribuidor` SET fechaEntregaInterna = ? "
                     + " WHERE `idSolicitudDistribuidor` = ?;";
@@ -135,13 +131,13 @@ public class SolicitudDistribuidorDAO {
             resultado = pstmt.executeUpdate();
 
             if (resultado != 0) {
-                salida = "La base de datos ha tenido cambios sactisfactorios";
+                msgSalida = "La base de datos ha tenido cambios sactisfactorios";
             } else {
-                salida = "No ocurrio nada!";
+                msgSalida = "No ocurrio nada!";
             }
         } catch (SQLException sqle) {
-            salida = "Ha ocurrido lo siguiente... " + sqle.getMessage();
+            msgSalida = "Ha ocurrido lo siguiente... " + sqle.getMessage();
         }
-        return salida;
+        return msgSalida;
     }
 }

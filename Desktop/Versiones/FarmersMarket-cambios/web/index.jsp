@@ -39,12 +39,12 @@
                 <div class="col-xs-12">
                     <div class="nav"> 						
                         <ul id="bar" style="align:left;">
-                            <li><a href="index.jsp">Inicio  | </a></li>
+                            <li><a href="#">Inicio  | </a></li>
                             <li><a href="#">Información   |</a></li>
                             <li><a href="#">Fotos     |</a></li>
-                            <li><a href="paginas/filtro.jsp">Búsqueda   |</a></li>
-                            <li><a href="paginas/registro.jsp">Registrarte     |</a></li>
-                            <li><a href="paginas/login.jsp">Iniciar sesión   |</a></li>
+                            <li><a href="paginas/ofertas/filtro.jsp">Búsqueda   |</a></li>
+                            <li><a href="paginas/usuarios/registro.jsp">Registrarte     |</a></li>
+                            <li><a href="paginas/usuarios/login.jsp">Iniciar sesión   |</a></li>
                         </ul>
                         
                     </div>

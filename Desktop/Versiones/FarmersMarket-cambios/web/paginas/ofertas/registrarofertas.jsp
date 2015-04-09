@@ -4,6 +4,8 @@
     Author     : krito
 --%>
 
+<%@page import="facade.FacadeConsultas"%>
+<%@page import="facade.FacadeProductosAsociadosUsuarios"%>
 <%@page import="daos.Consultas"%>
 <%@page import="dtos.UsuariosDTO"%>
 <%@page import="daos.ProductosAsociadosUsuariosDAO"%>
@@ -32,9 +34,9 @@
                 UsuariosDTO uregistrado = (UsuariosDTO) miSesion.getAttribute("usr");
                 String menu = (String) miSesion.getAttribute("mp");
 
-                ProductosAsociadosUsuariosDAO padao = new ProductosAsociadosUsuariosDAO();
+                FacadeProductosAsociadosUsuarios facadeProAso = new FacadeProductosAsociadosUsuarios();
                 ArrayList<ProductosAsociadosUsuariosDTO> productos = new ArrayList();
-                productos = padao.listarProductosByUser(uregistrado.getIdUsuarios());
+                productos = facadeProAso.listarProductosByUser(uregistrado.getIdUsuarios());
         %>
     </head>
     <body>
@@ -45,10 +47,10 @@
             <div class="col-xs-12" >
                 <div class="nav"> 						
                     <ul id="bar"  style="float:left;">
-                        <li><a href="../../index.jsp">Inicio</a></li>
+                        <li><a href="../usuarios/perfil.jsp">Inicio</a></li>                    
                     </ul>						
                     <ul id="bar"  style="float:right;">
-                        <li><a href="logout.jsp">Cerrar sesión</a></li>
+                        <li><a href="uregistrado.getIdUsuarios()">Cerrar sesión</a></li>
                     </ul>
                 </div>	
             </div>
@@ -69,10 +71,10 @@
                                                     <label for ="txtProductoAsociado" class="col-sm-2 control-label">Nombre producto:</label>
                                                     <div class="col-sm-10">
                                                         <select name="txtProductoAsociado" class="form-control">
-                                                                <% for (ProductosAsociadosUsuariosDTO pro : productos) {%>
-                                                                <option value="<%if (pro != null) {
-                                                                        out.print(pro.getIdProductosAsociadosUsuarios());
-                                                                    }%>">
+                                                            <% for (ProductosAsociadosUsuariosDTO pro : productos) {%>
+                                                            <option value="<%if (pro != null) {
+                                                                    out.print(pro.getIdProductosAsociadosUsuarios());
+                                                                }%>">
                                                                 <%if (pro != null) {
                                                                         out.print(pro.getProducto().getNombre());
                                                                     }%></option>
@@ -119,7 +121,7 @@
                                                 } else {
                                                     response.sendRedirect("../index.jsp");
                                                 }
-                                                                                            //class="text-left"
+                                                //class="text-left"
                                             %>
                                         </div>   
                                     </div>
@@ -135,9 +137,10 @@
                     <ul>
                         <li><a id="sena" href="http://www.sena.edu.co/">Sena</a></li>
                         <li>Stefhany Alfonso Rincón</li>
-                            <li>Última actualización: 
-                            <%Consultas c = new Consultas();
-                            out.println(c.consultarFecha());%></li>
+                        <li>Última actualización: 
+                            <%
+                            FacadeConsultas facadeConsults = new FacadeConsultas();
+                                out.println(facadeConsults.consultarFecha());%></li>
                         <li><a href="http://www.minagricultura.gov.co/">MinAgricultura</a></li>
                     </ul>
                 </nav>

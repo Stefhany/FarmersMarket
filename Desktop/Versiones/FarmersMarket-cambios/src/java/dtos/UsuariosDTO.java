@@ -22,6 +22,7 @@ public class UsuariosDTO {
     private boolean notificacion;
     private String ciudad;
     private String fechaNacimiento;
+    private int estado = 0;
     
     public UsuariosDTO(){}
     
@@ -211,11 +212,24 @@ public class UsuariosDTO {
     public void setFechaNacimiento(String fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
+    
+    /**
+     * @return the estado
+     */
+    public int getEstado() {
+        return estado;
+    }
+
+    /**
+     * @param estado the estado to set
+     */
+    public void setEstado(int estado) {
+        this.estado = estado;
+    }
 
     @Override
     public String toString() {
-        return "Usuarios"
-                + "idUsuarios=" + idUsuarios
+        return "UsuariosDTO{" + "idUsuarios=" + idUsuarios
                 + ", nombres=" + nombres
                 + ", apellidos=" + apellidos
                 + ", cedula=" + cedula
@@ -225,6 +239,9 @@ public class UsuariosDTO {
                 + ", clave=" + clave
                 + ", notificacion=" + notificacion
                 + ", ciudad=" + ciudad
-                + ", fechaNacimiento=" + fechaNacimiento + '}';
+                + ", fechaNacimiento=" + fechaNacimiento
+                + ", estado=" + estado + '}';
     }
+    
+    
 }

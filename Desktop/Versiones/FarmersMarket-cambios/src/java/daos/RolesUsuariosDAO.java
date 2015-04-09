@@ -17,14 +17,15 @@ import Conexion.Conection;
  * @author Mona
  */
 public class RolesUsuariosDAO {
+
     private PreparedStatement pstmt = null;
     private ResultSet rs = null;
     private Connection cnn = null;
-    
+
     public String insertarRol(RolesUsuariosDTO rol, Connection cnn) {
         this.cnn = cnn;
         int res = 0;
-        String sal = "";
+        String msgSalida = "";
         try {
             String querryInsertRol = " INSERT INTO rolesusuarios VALUES (?,?,1);";
             pstmt = cnn.prepareStatement(querryInsertRol);
@@ -32,13 +33,13 @@ public class RolesUsuariosDAO {
             pstmt.setInt(2, rol.getUsuariosId());
             res = pstmt.executeUpdate();
             if (res != 0) {
-               sal = "Cambio exitoso";
-            }else{
-                sal = "Lo siento, no se logro el cambio";
+                msgSalida = "Cambio exitoso";
+            } else {
+                msgSalida = "Lo siento, no se logro el cambio";
             }
         } catch (SQLException sqle) {
-            sal = "Se ha producido la sig excepción: " + sqle.getMessage();
+            msgSalida = "Se ha producido la sig excepción: " + sqle.getMessage();
         }
-        return sal;
+        return msgSalida;
     }
 }

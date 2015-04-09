@@ -8,6 +8,7 @@ package controlador;
 import daos.Consultas;
 import dtos.OfertasDTO;
 import dtos.ProductosAsociadosUsuariosDTO;
+import facade.FacadeConsultas;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
@@ -73,9 +74,10 @@ public class ControladorConsultas extends HttpServlet {
             out.println("<th>Nombre producto</th>");
             out.println("<th>Fecha de la oferta</th>");
             out.println("</tr>");
-            Consultas con = new Consultas();
+            //Consultas con = new Consultas();
+            FacadeConsultas facadeConsults = new FacadeConsultas();
             LinkedList<OfertasDTO> filtrar = new LinkedList();
-            filtrar = (LinkedList<OfertasDTO>) con.consultarFiltro(filtro);
+            filtrar = (LinkedList<OfertasDTO>) facadeConsults.consultarFiltro(filtro);
 
             //out.print(filtrar.size());
             if (filtrar.size() != 0) {

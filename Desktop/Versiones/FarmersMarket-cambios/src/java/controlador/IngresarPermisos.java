@@ -7,6 +7,7 @@ package controlador;
 
 import daos.UsuariosDAO;
 import dtos.UsuariosDTO;
+import facade.FacadeUsuarios;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -34,25 +35,29 @@ public class IngresarPermisos extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        FacadeUsuarios menu = new FacadeUsuarios();
+        
         if (request.getParameter("btnIngresar") != null && request.getParameter("btnIngresar").equals("Ingresar")) {
+            
                 String usr = request.getParameter("txtCorreo");
                 String psw = request.getParameter("txtClave");
-                UsuariosDAO menu = new UsuariosDAO();
                 UsuariosDTO datosUsuario = new UsuariosDTO();
+                            
                 String menuAPintar = "";
                 HashMap<UsuariosDTO, String> hs = new HashMap<UsuariosDTO, String>();
+                String url = request.getContextPath();
                 hs = menu.validarUsuarioV2(usr, psw);
                 for (Map.Entry<UsuariosDTO, String> registro : hs.entrySet()) {
                     datosUsuario = registro.getKey();
                     menuAPintar = registro.getValue();
                 }
-
-               // out.print("documento " + datosUsuario.getDocumento());
+                // out.print("documento " + datosUsuario.getDocumento());
                 if (datosUsuario.getCedula() != 0) {
                     HttpSession miSesion = request.getSession(true);
                     miSesion.setAttribute("usr", datosUsuario);
                     miSesion.setAttribute("mp", menuAPintar);
-                    response.sendRedirect("paginas/perfil.jsp");
+                    response.sendRedirect("paginas/usuarios/perfil.jsp");
 
                 } else {
                     response.sendRedirect("index.jsp?msg=no existe");
@@ -60,6 +65,36 @@ public class IngresarPermisos extends HttpServlet {
             } else {        
                 response.sendRedirect("index.jsp?msg=no puede ingresar");
             }
+//        
+//            if (request.getParameter("btnIngresar") != null && request.getParameter("btnIngresar").equals("Ingresar")) {
+//         
+//                String usr = request.getParameter("txtCorreo");
+//                String psw = request.getParameter("txtClave");
+//                UsuariosDTO datosUsuario = new UsuariosDTO();
+//                            
+//                UsuariosDAO menu = new UsuariosDAO();
+//                String menuAPintar = "";
+//                
+//                HashMap<UsuariosDTO, String> hs = new HashMap<UsuariosDTO, String>();
+//                String url = request.getContextPath();
+//                //hs = menu.validarUsuario(usr, psw);
+//                for (Map.Entry<UsuariosDTO, String> registro : hs.entrySet()) {
+//                    datosUsuario = registro.getKey();
+//                    menuAPintar = registro.getValue();
+//                }
+//                // out.print("documento " + datosUsuario.getDocumento());
+//                if (datosUsuario.getCedula() != 0) {
+//                    HttpSession miSesion = request.getSession(true);
+//                    miSesion.setAttribute("usr", datosUsuario);
+//                    miSesion.setAttribute("mp", menuAPintar);
+//                    response.sendRedirect("paginas/usuarios/perfil.jsp");
+//
+//                } else {
+//                    response.sendRedirect("index.jsp?msg=no existe");
+//                }
+//            } else {        
+//                response.sendRedirect("index.jsp?msg=no puede ingresar");
+//            }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

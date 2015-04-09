@@ -22,7 +22,7 @@ public class RolesDAO {
     private ResultSet rs = null;
     private Connection cnn = null;
     
-    public ArrayList<RolesDTO> consultarroles(Connection cnn) {
+    public ArrayList<RolesDTO> consultarRoles(Connection cnn) {
         this.cnn = cnn;
         ArrayList<RolesDTO> roles = new ArrayList();
         try {
@@ -37,6 +37,8 @@ public class RolesDAO {
                     rol.setEstado(rs.getString("estado"));
                     roles.add(rol);
                 }
+            }else{
+                System.out.println("No hay registros...");
             }
         } catch (SQLException sqle) {
             System.out.println("Se ha producido la sig excepción: " + sqle.getMessage());

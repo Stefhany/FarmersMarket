@@ -31,7 +31,7 @@ public class DespachosPedidosDAO {
 
     public String insertarDespacho(DespachosPedidosDTO nuevoDespacho, Connection cnn) {
         this.cnn = cnn;
-        String salida = "";
+        String msgSalida = "";
         int resultado = 0;
         try {
             pstmt = cnn.prepareStatement("INSERT INTO despachospedidos VALUES (null, ?,?,?,?,?);");
@@ -43,18 +43,18 @@ public class DespachosPedidosDAO {
             resultado = pstmt.executeUpdate();
 
             if (resultado != 0) {
-                salida = "Despacho registrado satisfactorio. ";
+                msgSalida = "Despacho registrado satisfactorio. ";
             } else {
-                salida = "No se pudo realizar el registro";
+                msgSalida = "No se pudo realizar el registro";
             }
         } catch (SQLException sqle) {
-            salida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
+            msgSalida = "Ha ocurrido la siguiente exepción.. " + sqle.getMessage();
 
         }
-        return salida;
+        return msgSalida;
     }
 
-    public LinkedList<SolicitudDistribuidorDTO> mostrarDespachosPendientes() throws MyException {
+    public LinkedList<SolicitudDistribuidorDTO> mostrarDespachosPendientes(Connection cnn) throws MyException {
         LinkedList<SolicitudDistribuidorDTO> solicitudes = new LinkedList();
         try {
             String querryAllDespachos = " select idSolicitudDistribuidor, idUsuarios,"
@@ -93,9 +93,8 @@ public class DespachosPedidosDAO {
         return solicitudes;
     }
 
-    public SolicitudDistribuidorDTO consultarSolicitud(int id) {
+    public SolicitudDistribuidorDTO consultarSolicitud(int id, Connection cnn) {
         SolicitudDistribuidorDTO solicitud = null;
-        String salida = "";
         try {
             String querrySolicitudesDistribuidor = " select idSolicitudDistribuidor, idUsuarios, "
                     + " CONCAT(u.nombres,' ',u.apellidos) as Solicitante, "
@@ -115,10 +114,12 @@ public class DespachosPedidosDAO {
                     solicitud.setIdSolicitud(rs.getInt("idSolicitudDistribuidor"));
                     solicitud.setFechaSolicitud(rs.getString("fechaSolicitud"));
                 }
+            }else{
+                System.out.println("No hay registros...");
             }
 
         } catch (SQLException sqle) {
-            salida = "Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState();
+            System.out.println("Mira lo que ocurrio! " + sqle.getMessage() + " y " + sqle.getSQLState());
         }
         return solicitud;
     }

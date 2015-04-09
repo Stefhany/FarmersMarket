@@ -19,7 +19,7 @@
             HttpSession misesion = request.getSession(false);
             
             if (misesion.getAttribute("usuarioLogueado") == null) {
-                response.sendRedirect("../index.jsp?msg");
+                response.sendRedirect("../../index.jsp?msg");
 
             } else {
                 misesion.removeAttribute("usuarioLogueado");

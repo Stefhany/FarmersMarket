@@ -4,6 +4,8 @@
     Author     : Mona
 --%>
 
+<%@page import="facade.FacadeCategorias"%>
+<%@page import="facade.FacadeConsultas"%>
 <%@page import="daos.Consultas"%>
 <%@page import="dtos.UsuariosDTO"%>
 <%@page import="dtos.CategoriaDTO"%>
@@ -24,9 +26,10 @@
             if (miSesion.getAttribute("usr") != null) {
                 UsuariosDTO uregistrado = (UsuariosDTO) miSesion.getAttribute("usr");
                 String menu = (String) miSesion.getAttribute("mp");
-                CategoriaDAO cdao = new CategoriaDAO();
+                
+                FacadeCategorias facadeCategories = new FacadeCategorias();
                 ArrayList<CategoriaDTO> categorias = new ArrayList();
-                categorias = (ArrayList<CategoriaDTO>) cdao.listarCategorias();
+                categorias = (ArrayList<CategoriaDTO>) facadeCategories.listarCategorias();
         %>
     </head>
     <body>
@@ -134,8 +137,11 @@
                         <li><a id="sena" href="http://www.sena.edu.co/">Sena</a></li>
                         <li>Stefhany Alfonso Rincón</li>
                             <li>Última actualización: 
-                            <%Consultas c = new Consultas();
-                            out.println(c.consultarFecha());%></li>
+                            <%
+                                FacadeConsultas facadeConsults = new FacadeConsultas();
+                                out.println(facadeConsults.consultarFecha());
+                            %>
+                            %></li>
                         <li><a href="http://www.minagricultura.gov.co/">MinAgricultura</a></li>
                     </ul>
                 </nav>

@@ -4,6 +4,7 @@
     Author     : krito
 --%>
 
+<%@page import="facade.FacadeCategorias"%>
 <%@page import="dtos.UsuariosDTO"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="dtos.CategoriaDTO"%>
@@ -25,9 +26,10 @@
             if (miSesion.getAttribute("usr") != null) {
                 UsuariosDTO uregistrado = (UsuariosDTO) miSesion.getAttribute("usr");
                 String menu = (String) miSesion.getAttribute("mp");
-                CategoriaDAO cdao = new CategoriaDAO();
+                
+                FacadeCategorias facadeCategories = new FacadeCategorias();
                 ArrayList<CategoriaDTO> categorias = new ArrayList();
-                categorias = (ArrayList<CategoriaDTO>) cdao.listarCategorias();
+                categorias = (ArrayList<CategoriaDTO>) facadeCategories.listarCategorias();
         %>
     </head>
     <body>
@@ -36,9 +38,12 @@
                 <img src="../../img/banner.png" alt="" class="col-xs-12">
             </header>
             <div class="col-xs-12" >
-                <div class="nav"> 						
+                <div class="nav"> 
+                    <ul id="bar"  style="float:left;">
+                        <li><a href="../usuarios/perfil.jsp">Inicio</a></li>
+                    </ul>
                     <ul id="bar"  style="float:right;">
-                        <li><a href="logout.jsp">Cerrar sesión</a></li>
+                        <li><a href="../usuarios/logout.jsp">Cerrar sesión</a></li>
                     </ul>
                 </div>	
             </div>
@@ -54,7 +59,7 @@
                                     <center>
                                         <h1>Registrar producto</h1>
                                         <div name="regProducto" style="width: 500px;">
-                                            <form action="../cpro" name="regProducto" method="post" class="form-horizontal" align="center">
+                                            <form action="../../cpro" name="regProducto" method="post" class="form-horizontal" align="center">
 
                                                 <div class="form-group">
                                                     <label for ="txtNombre" class="col-sm-2 control-label">Nombre:</label>

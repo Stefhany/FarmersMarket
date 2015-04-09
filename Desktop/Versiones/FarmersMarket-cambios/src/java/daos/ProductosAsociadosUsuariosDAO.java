@@ -114,6 +114,8 @@ public class ProductosAsociadosUsuariosDAO {
 
             if (rtdo != 0) {
                 msgSalida = "Registro " + rtdo + " eliminado. Exitosamente";
+            }else{
+                msgSalida = "No se pudo eliminar. ";
             }
         } catch (SQLException sqle) {
             msgSalida = "Ocurrio esta excepción " + sqle.getMessage();
@@ -124,7 +126,7 @@ public class ProductosAsociadosUsuariosDAO {
     public String insertarProductoAsociado(String nomProducto, int categoria,int idUsuario, Connection cnn) {
         this.cnn = cnn;
         int sal = 0;
-        String res = "";
+        String msgSalida = "";
         try {
             cllstmt = cnn.prepareCall("{call ps_registrarProductoV5 (?,?,?,?)}");
             cllstmt.setString(1, nomProducto);
@@ -135,13 +137,13 @@ public class ProductosAsociadosUsuariosDAO {
             sal = cllstmt.getInt(4);
 
             if (sal == 1) {
-                res = "Registro exitoso";
+                msgSalida = "Registro exitoso";
             }  else {
-                res = "Something was wrong!!!";
+                msgSalida = "No se pudo registrar el producto!!!";
             }
         } catch (SQLException sqle) {
-            res = "Pilas! Ocurrio la siguiente excepción " + sqle.getMessage();
+            msgSalida = "Pilas! Ocurrio la siguiente excepción " + sqle.getMessage();
         }
-        return res;
+        return msgSalida;
     }
 }

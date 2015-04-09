@@ -5,9 +5,8 @@
  */
 package controlador;
 
-import daos.MyException;
-import daos.UsuariosDAO;
 import dtos.UsuariosDTO;
+import facade.FacadeUsuarios;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -19,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import utilidades.MyException;
 
 /**
  *
@@ -36,37 +36,27 @@ public class ControladorUsuarios extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, MyException {
+            throws ServletException, IOException, MyException{
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        UsuariosDTO user = new UsuariosDTO();
+        FacadeUsuarios facadeUser = new FacadeUsuarios();
+        String salida = "";
         try {     
             if (request.getParameter("btnModificarUsuario") != null && request.getParameter("modificarUsuario") != null) {
-                out.print("ok");
-                UsuariosDTO user = new UsuariosDTO();
+                                
                 user.setIdUsuarios(Integer.parseInt(request.getParameter("txtId").trim()));
                 user.setTelefono(Integer.parseInt(request.getParameter("txtTelefono").trim()));
                 user.setDireccion(request.getParameter("txtDireccion").trim());
                 user.setCorreo(request.getParameter("txtCorreo").trim());
                 user.setCiudad(request.getParameter("txtCiudad").trim());
-                UsuariosDAO userDao = new UsuariosDAO();
-                String salida = userDao.modificarUsuario(user);
-                response.sendRedirect("paginas/perfil.jsp?=msg "+salida);
+                
+                salida = facadeUser.modificarUsuario(user);
+                
+                response.sendRedirect("paginas/usuarios/perfil.jsp?=msgSalida "+salida);
             }else{
                 out.println("Su ingreso no es permitido");
             }
-            /*
-             * TODO output your page here. You may use following sample
-             * code.
-             */
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet Controlador</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet Controlador at " + request.getContextPath() + "</h1>");
-            out.println("<h1> acceso invalido</h1>");
-            out.println("</body>");
-            out.println("</html>");
 
         } finally {
             out.close();

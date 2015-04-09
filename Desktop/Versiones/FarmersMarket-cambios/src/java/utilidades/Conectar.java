@@ -25,7 +25,7 @@ public class Conectar {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            cnn = DriverManager.getConnection("jdbc:mysql://localhost:3306/fm", "root", "");
+            cnn = DriverManager.getConnection("jdbc:mysql://localhost:3306/fm", "stefhany", "123");
         } catch (SQLException sqle) {
             System.out.println("Error Inesperado" + sqle);
 

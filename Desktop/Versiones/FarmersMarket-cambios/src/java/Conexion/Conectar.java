@@ -48,6 +48,7 @@ public class Conectar extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet Conectar at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Resultado de la conexión " + getConnection() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }finally{
@@ -67,11 +68,10 @@ public class Conectar extends HttpServlet {
 
                 CategoriaDTO c = new CategoriaDTO();
                 CategoriaDAO cc = new CategoriaDAO();
-                c.setIdCategoria(4);
-                c.setNombre("Prueba");
+                c.setNombre("Prueba1000");
                 salida = cc.registrarCategoria(c, cnn);
             } else {
-                salida = "LO siento hay un error";
+                salida = "Lo siento hay un error";
             }
         } catch (NamingException ex) {
             salida += ex.getMessage();
@@ -79,8 +79,6 @@ public class Conectar extends HttpServlet {
             salida += sqle.getMessage();
         }
         return salida;
-
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

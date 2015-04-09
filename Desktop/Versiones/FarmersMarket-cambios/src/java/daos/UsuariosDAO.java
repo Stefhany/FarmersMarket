@@ -13,6 +13,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import Conexion.Conection;
+import dtos.PermisosDTO;
+import dtos.RolesDTO;
+import utilidades.Conectar;
 import utilidades.MyException;
 
 /**
@@ -44,9 +47,9 @@ public class UsuariosDAO {
             //mensaje = pstmt.toString();
             rtdo = pstmt.executeUpdate();
             if (rtdo != 0) {
-                msgSalida = "Se han modificado " + rtdo + " registro satisfatoriamente ";
+                msgSalida = "Se ha registrado satisfatoriamente ";
             } else {
-                msgSalida = "ha ocirrido in error en la creacion ";
+                msgSalida = "ha ocirrido en el registro... ";
             }
         } catch (SQLException sd) {
             msgSalida = " ocurrido un error en " + sd.getMessage();
@@ -56,7 +59,7 @@ public class UsuariosDAO {
 
     public String modificarUsuario(UsuariosDTO usuario, Connection cnn) throws MyException {
         this.cnn = cnn;
-        String sal = "";
+        String msgSalida = "";
         int res = 0;
         try {
             String queryUpDateUser = " UPDATE usuarios SET telefono=?, "
@@ -71,14 +74,14 @@ public class UsuariosDAO {
             res = pstmt.executeUpdate();
 
             if (res != 0) {
-                sal = "El campo se ha modificado: " + res + " satisfactoriamente.";
+                msgSalida = "El campo se ha modificado: " + res + " satisfactoriamente.";
             } else {
-                sal = "Error";
+                msgSalida = "Error";
             }
         } catch (SQLException sqle) {
             throw new MyException("Lo siento, ocurrio lo siguiente: " + sqle.getSQLState() + " y " + sqle.getMessage());
         }
-        return sal;
+        return msgSalida;
     }
 
     public String eliminarUsuario(int id, Connection cnn) {
@@ -86,15 +89,13 @@ public class UsuariosDAO {
         int rtdo = 0;
         String msgSalida = "";
         try {
-            pstmt = cnn.prepareStatement("delete from usuarios where idUsuarios=?;");
+            pstmt = cnn.prepareStatement("delete from usuarios where idUsuarios=?");
             pstmt.setInt(1, id);
             rtdo = pstmt.executeUpdate();
 
             if (rtdo != 0) {
-                msgSalida = "El siguiente campo" + rtdo + "se elimino Corretamente";
-            } else {
-                msgSalida = "Ocurrio Un Error";
-            }
+                msgSalida = "El registro se elimino corretamente";
+            } 
         } catch (SQLException sqlexception) {
             msgSalida = "Ocurrio un error" + sqlexception.getMessage();
         }
@@ -124,6 +125,8 @@ public class UsuariosDAO {
                     user.setFechaNacimiento(rs.getString("fechaNacimiento"));
                     listaUsuarios.add(user);
                 }
+            }else{
+                System.out.println("No se encontraron registros..");
             }
         } catch (SQLException sqle) {
             System.out.println("Se ha producido la sig excepción: " + sqle.getMessage());
@@ -155,6 +158,8 @@ public class UsuariosDAO {
                     user.setCiudad(rs.getString("ciudad"));
                     user.setFechaNacimiento(rs.getString("Fechanacimiento"));
                 }
+            }else{
+                System.out.println("No se encontraron registros...");
             }
         } catch (SQLException sqle) {
             System.out.println("eyy " + sqle.getMessage());
@@ -289,4 +294,82 @@ public class UsuariosDAO {
 
         return usuarioValidado;
     }
+    
+    public ArrayList<String> validarUsuario(String correo, String pss) {
+        cnn = Conectar.getInstance();
+        
+        PreparedStatement stmt;
+        String menu = "<ul>";
+        ArrayList<String> urls = new ArrayList();
+        HashMap<UsuariosDTO, String> usuarioValidado = new HashMap<UsuariosDTO, String>();
+        UsuariosDTO user = new UsuariosDTO();
+        
+        ResultSet rs = null;
+        try {
+            stmt = cnn.prepareStatement(" SELECT u.idUsuarios, u.nombres,u.apellidos, u.cedula, u.telefono, "
+                    + " u.direccion, u.correo, u.clave, u.notificaciones, u.ciudad, u.fechaNacimiento, "
+                    + " r.idRoles, p.nombre, p.url, p.idPermisos "
+                    + " FROM usuarios u "
+                    + " INNER JOIN rolesusuarios ru on u.idUsuarios = ru.usuariosId "
+                    + " INNER JOIN roles r on ru.rolesId = r.idRoles "
+                    + " INNER JOIN permisosroles pr on r.idRoles = pr.rolesId "
+                    + " INNER JOIN permisos p on pr.permisosId = p.idPermisos "
+                    + " WHERE u.correo = ? "
+                    + " AND u.clave = MD5(?)"
+                    + " AND p.padre = 0;");
+            pstmt.setString(1, correo);
+            pstmt.setString(2, pss);                 
+
+            rs = stmt.executeQuery();
+            if (rs!=null) {
+                while (rs.next()) {
+
+                    user.setIdUsuarios(rs.getInt("idUsuarios"));
+                    user.setNombres(rs.getString("nombres"));
+                    user.setApellidos(rs.getString("apellidos"));
+                    user.setCedula(rs.getInt("cedula"));
+                    user.setTelefono(rs.getInt("telefono"));
+                    user.setDireccion(rs.getString("direccion"));
+                    user.setCorreo(rs.getString("correo"));
+                    user.setClave(rs.getString("clave"));
+                    user.setNotificacion(rs.getBoolean("notificaciones"));
+                    user.setCiudad(rs.getString("ciudad"));
+                    user.setFechaNacimiento(rs.getString("Fechanacimiento"));
+                    menu += "<li>";
+                    
+                    // menu+="<a href='"+rs.getString("url")+"'>"+rs.getString("descripcion")+"</a>";
+                    urls.add(rs.getString("nombre"));
+                    menu += rs.getString("nombre");
+                    ResultSet rsSub = cnn.prepareStatement(" SELECT p.idPermisos, p.nombre, p.url "
+                            + " FROM permisos p INNER JOIN permisosroles pr ON p.idPermisos = pr.permisosId "
+                            + " WHERE padre = " + rs.getInt("idPermisos")
+                            + " AND pr.rolesId = " + rs.getInt("idRoles")).executeQuery();
+
+                    menu += "<ul>";
+                    while (rsSub.next()) {
+                        String newUrl =rsSub.getString("url");
+                        menu += "<li>";
+                        menu += "<a href='" + rsSub.getString("url") + "'>" + rsSub.getString("p.nombre") + "</a>";
+                        menu += "</li>";
+                        urls.add(newUrl);
+                    }
+
+                    menu += "</ul>";
+                    menu += "</li>";
+                }
+                menu += "</ul>";
+            }else{
+                menu="";
+            }
+        }catch (SQLException sqle) {
+
+            menu = " error " + sqle.getMessage();
+
+        } finally {
+        }usuarioValidado.put (user, menu);
+
+    return urls ;
+}
+    
+    
 }
